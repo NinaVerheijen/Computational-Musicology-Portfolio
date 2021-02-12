@@ -25,3 +25,4 @@ The comparison points in this corpus are between the different studio albums, be
 The corpus is quite representative as there are plenty of albums, and thus tracks, to compare. However, when looking at changes in albums over time, it has to be noted that 6 of the 7 studio albums were released in a 14 year time period (1995-2009), and in the last 12 years only one album has been released.
 
 A few tracks that are atypical are *Diamant*, *Roter Sand*, *Los* and *Ein Lied*. *Diamant* and *Roter Sand* have sound a lot more like ballads than the industrial metal we're used from Rammstein. *Los* and *Ein Lied* both have a more slow, easy going tempo and have less distortion than other songs in the corpus.
+
