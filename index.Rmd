@@ -40,8 +40,11 @@ library(ggplot2)
 ```
 
 ```{r echo = FALSE}
-rammstein <- get_playlist_audio_features("","4ubZwxPRbLmmaxwsrcoksY")
+all_data_rammstein <- get_playlist_audio_features("","4ubZwxPRbLmmaxwsrcoksY")
 
+
+rammstein <- all_data_rammstein%>%
+  select(c(36, 50, 6:16))
 
 rammstein_sum <- rammstein%>%
   group_by(track.album.release_date)%>%
@@ -63,10 +66,11 @@ rammstein_sum <- rammstein%>%
 
 
 ## Changes over time
+
 When comparing the first and last album, the first one released in 1995 and the last one released in 2019, a few things have changed when looking at spotify features.
 
 
-The features with the most change are danceability, valence, tempo and instrumentalness. The danceability, valence and instrumentalness are all lower in the last album than in the first album.
+The features with the most change are danceability, valence, tempo and instrumentalness. The danceability, valence and instrumentalness are all lower in the last album than in the first album. Contrary to that, the tempo is higher in the last album than in the first album.
 
 
 
@@ -85,6 +89,11 @@ rammstein_f_l_val <- ggplot(rammstein_first_last, aes(valence, danceability, siz
 rammstein_f_l_val
 ```
 
+
+To see if this was also the case whe looking at all albums, the valence, danceability, instrumentalness and tempo were plotted for each album. The release date are shown because the time between album releases differs.
+When looking at all albums, it can be seen that it is indeed the case for all albums. What also shows is that where for the first two albums, the tracks are close together and only show some difference in tempo and instrumentallness. However, for albums from 2001 and further, there is more variation in the tracks from each album. With the only exception being the album from 2005, in which the tracks are again fairly similar in danceability and valence.
+
+The last album has the most variation in danceablity and valence. However, the instrumentalness stays quit the same for most tracks in the last album.
 
 ```{r echo=FALSE}
 rammstein_dance_val <- ggplot(rammstein, aes(valence, danceability, size=instrumentalness, color=tempo)) +
