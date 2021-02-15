@@ -34,12 +34,14 @@ A few tracks that are atypical are *Diamant*, *Roter Sand*, *Los* and *Ein Lied*
 
 ```{r echo = FALSE, message=FALSE}
 library(tidyverse)
+library(dplyr)
 library(spotifyr)
 library(ggplot2)
 ```
 
 ```{r echo = FALSE}
 rammstein <- get_playlist_audio_features("","4ubZwxPRbLmmaxwsrcoksY")
+
 
 rammstein_sum <- rammstein%>%
   group_by(track.album.release_date)%>%
@@ -59,11 +61,40 @@ rammstein_sum <- rammstein%>%
 
 ```
 
-```{r echo = FALSE}
-rammstein_time <- ggplot(rammstein, aes(track.album.release_date, tempo, color=valence, size=key)) +
-  geom_point(alpha=0.2)
 
-rammstein_time
+## Changes over time
+When comparing the first and last album, the first one released in 1995 and the last one released in 2019, a few things have changed when looking at spotify features.
+
+
+The features with the most change are danceability, valence, tempo and instrumentalness. The danceability, valence and instrumentalness are all lower in the last album than in the first album.
+
+
+
+```{r echo = FALSE}
+rammstein_2019 <- rammstein %>%
+  filter(track.album.release_date == "2019-05-17")
+
+rammstein_1995 <- rammstein %>%
+  filter(track.album.release_date == "1995-09-24")
+
+rammstein_first_last <- bind_rows(rammstein_1995, rammstein_2019)
+
+rammstein_f_l_val <- ggplot(rammstein_first_last, aes(valence, danceability, size=instrumentalness, shape=track.album.release_date, color=tempo))+
+  geom_point() 
+
+rammstein_f_l_val
 ```
+
+
+```{r echo=FALSE}
+rammstein_dance_val <- ggplot(rammstein, aes(valence, danceability, size=instrumentalness, color=tempo)) +
+  geom_point(alpha=0.8) +
+  facet_wrap(~track.album.release_date)
+
+rammstein_dance_val
+```
+
+
+
 
 
