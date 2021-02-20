@@ -2,8 +2,13 @@
 title: "Computational Musicology Portfolio"
 author: "Nina Verheijen"
 date: "9-2-2021"
-output: html_document
+output: 
+  flexdashboard::flex_dashboard:
+    storyboard: true
+    theme: flatly
 ---
+
+### Intorduction
 
 Starting in Berlin in 1994, Rammstein has been around for almost 30 years. With their first album *Herzeleid* released in September 1995, and their lates album *Rammstein* in May 2019, a lot has changed in the music industry since they first started. This raises the question whether their music has changed as well, and if so, how?
 
@@ -37,14 +42,33 @@ library(tidyverse)
 library(dplyr)
 library(spotifyr)
 library(ggplot2)
+library(plotly)
 ```
 
 ```{r echo = FALSE}
 all_data_rammstein <- get_playlist_audio_features("","4ubZwxPRbLmmaxwsrcoksY")
 
+rammstein_paris <- get_playlist_audio_features("","4td6SJ4cvyFWgJn9I9EtnT")
+rammstein_berlin <- get_playlist_audio_features("","1YWLnvtP4lgROQWB7HqZxT")
+
+  
 
 rammstein <- all_data_rammstein%>%
   select(c(36, 50, 6:16))
+
+rammstein_live <- bind_rows(
+  rammstein_paris %>% mutate(category = "live at paris"),
+  rammstein_berlin %>% mutate(category = "live at berlin") 
+  )%>%
+  select(c(36, "category", 50, 6:16))
+
+rammstein_not_live <- get_playlist_audio_features("","0A0m04BWQCIozwguPMaRzE") %>%
+  select(c(36, 50, 6:16))
+
+live_not_live <- bind_rows(
+  rammstein_live,
+  rammstein_not_live %>% mutate(category = "studio")
+)
 
 rammstein_sum <- rammstein%>%
   group_by(track.album.release_date)%>%
@@ -65,13 +89,7 @@ rammstein_sum <- rammstein%>%
 ```
 
 
-## Changes over time
-
-When comparing the first and last album, the first one released in 1995 and the last one released in 2019, a few things have changed when looking at spotify features.
-
-
-The features with the most change are danceability, valence, tempo and instrumentalness. The danceability, valence and instrumentalness are all lower in the last album than in the first album. Contrary to that, the tempo is higher in the last album than in the first album.
-
+### What changed between the first and last album from Rammstein?
 
 
 ```{r echo = FALSE}
@@ -83,27 +101,62 @@ rammstein_1995 <- rammstein %>%
 
 rammstein_first_last <- bind_rows(rammstein_1995, rammstein_2019)
 
-rammstein_f_l_val <- ggplot(rammstein_first_last, aes(valence, danceability, size=instrumentalness, shape=track.album.release_date, color=tempo))+
+rammstein_f_l_val <- ggplot(rammstein_first_last, aes(valence, danceability, color=track.album.release_date, size=instrumentalness, label=track.name))+
   geom_point() 
 
-rammstein_f_l_val
+ggplotly(rammstein_f_l_val)
 ```
 
+
+
+***
+
+When comparing the first and last album, the first one released in 1995 and the last one released in 2019, a few things have changed when looking at spotify features.
+
+
+The features with the most change are danceability, valence, tempo and instrumentalness. The danceability, valence and instrumentalness are all lower in the last album than in the first album. Contrary to that, the tempo is higher in the last album than in the first album.
+
+
+
+### Rammstein's albums over time.
+
+
+```{r echo=FALSE}
+rammstein_dance_val <- ggplot(rammstein, aes(valence, danceability, size=instrumentalness, color=tempo, label=track.name)) +
+  geom_point(alpha=0.81) +
+  facet_wrap(~track.album.release_date)
+
+ggplotly(rammstein_dance_val)
+```
+
+***
 
 To see if this was also the case whe looking at all albums, the valence, danceability, instrumentalness and tempo were plotted for each album. The release date are shown because the time between album releases differs.
 When looking at all albums, it can be seen that it is indeed the case for all albums. What also shows is that where for the first two albums, the tracks are close together and only show some difference in tempo and instrumentallness. However, for albums from 2001 and further, there is more variation in the tracks from each album. With the only exception being the album from 2005, in which the tracks are again fairly similar in danceability and valence.
 
 The last album has the most variation in danceablity and valence. However, the instrumentalness stays quit the same for most tracks in the last album.
 
-```{r echo=FALSE}
-rammstein_dance_val <- ggplot(rammstein, aes(valence, danceability, size=instrumentalness, color=tempo)) +
-  geom_point(alpha=0.8) +
-  facet_wrap(~track.album.release_date)
 
-rammstein_dance_val
+### In summary
+
+```{r echo=FALSE}
+rammstein_dance_val <- ggplot(rammstein, aes(track.album.release_date, danceability, size=instrumentalness, color=tempo, label=track.name)) +
+  geom_point(aes(alpha=valence)) 
+
+ggplotly(rammstein_dance_val)
 ```
 
 
+### Does Rammstein really sound as good live as they do in the studio?
 
 
+```{r echo=FALSE}
+
+
+rammstein_live_not_live <- ggplot(live_not_live, aes(valence, danceability, size=instrumentalness, color=category, label=track.name)) +
+  geom_point(alpha=0.81) 
+
+
+ggplotly(rammstein_live_not_live)
+```
 
