@@ -75,10 +75,6 @@ rammstein_sum <- rammstein%>%
 
 ### Why is *Diamant* so different from their other songs?
 
-***
-
-As mentioned before, *diamant* is a very atipical song from Rammstein since it sound much more like a full on ballad than a heavy metal song. To see how this song differs from a more typical Rammstein song like *Du hast* or *Links 2 3 4 *, the chroma-based and timbre-based self-similarity matrices for these songs are shown. What stands out is that *Du hast* and *Links 2 3 4* have a much more clear structure and when listening to the songs the patterns are very recognizable. *Diamant* on the other hand has a much more complex structure and when listening to the song it is hard to recognize the patterns from the matrix.
-
 
 #### Diamant
 
@@ -179,6 +175,7 @@ bind_rows(
   labs(x = "", y = "")
 ```
 
+
 #### Link 2 3 4
 
 ```{r echo = FALSE}
@@ -226,6 +223,10 @@ bind_rows(
   theme_classic() +
   labs(x = "", y = "")
 ```
+***
+
+As mentioned before, *diamant* is a very atipical song from Rammstein since it sound much more like a full on ballad than a heavy metal song. To see how this song differs from a more typical Rammstein song like *Du hast* or *Links 2 3 4 *, the chroma-based and timbre-based self-similarity matrices for these songs are shown. What stands out is that *Du hast* and *Links 2 3 4* have a much more clear structure and when listening to the songs the patterns are very recognizable. *Diamant* on the other hand has a much more complex structure and when listening to the song it is hard to recognize the patterns from the matrix.
+
 
 
 ### Introduction
