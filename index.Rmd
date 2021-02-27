@@ -1,40 +1,14 @@
 ---
 title: "Computational Musicology Portfolio"
 author: "Nina Verheijen"
-date: "9-2-2021"
+date: "February 2021"
 output: 
   flexdashboard::flex_dashboard:
     storyboard: true
     theme: flatly
 ---
 
-### Intorduction
 
-Starting in Berlin in 1994, Rammstein has been around for almost 30 years. With their first album *Herzeleid* released in September 1995, and their lates album *Rammstein* in May 2019, a lot has changed in the music industry since they first started. This raises the question whether their music has changed as well, and if so, how?
-
-To answer this question, a corpus is used which consists of  the seven studio albums from Rammstein (77 tracks);
-
-* *Herzeleid* (1995)
-* *Sehnsucht* (1997)
-* *Mutter* (2001)
-* *Reise, Reise* (2004)
-* *Rosenrot* (2005)
-* *Liebe ist für alle da* (2009)
-* *Rammstein* (2019)
-
-In addition to this two live albums were also inlcuded (27 tracks);
-
-* *Live aus Berlin* (1999)
-* *Rammstein: Paris* (2017)
-
-The studio albums were included to see if their music changed over time and if so how? What changed? What did not change through all those years? Are there similarities between albums?
-The studio albums are added because it might also be interesting to look at differneces between live and studio albums.
-
-The comparison points in this corpus are between the different studio albums, between the live albums and their corresponding studio tracks and between the live albums.
-
-The corpus is quite representative as there are plenty of albums, and thus tracks, to compare. However, when looking at changes in albums over time, it has to be noted that 6 of the 7 studio albums were released in a 14 year time period (1995-2009), and in the last 12 years only one album has been released.
-
-A few tracks that are atypical are *Diamant*, *Roter Sand*, *Los* and *Ein Lied*. *Diamant* and *Roter Sand* have sound a lot more like ballads than the industrial metal we're used from Rammstein. *Los* and *Ein Lied* both have a more slow, easy going tempo and have less distortion than other songs in the corpus.
 
 
 ```{r echo = FALSE, message=FALSE}
@@ -55,21 +29,30 @@ rammstein_berlin <- get_playlist_audio_features("","1YWLnvtP4lgROQWB7HqZxT")
   
 
 rammstein <- all_data_rammstein%>%
-  select(c(36, 50, 6:16))
-
+  select(c(36, 50, 6:16)) %>%
+  mutate(
+    track.album.release_date = lubridate::year(track.album.release_date)
+  )
+  
 rammstein_live <- bind_rows(
   rammstein_paris %>% mutate(category = "live at paris"),
   rammstein_berlin %>% mutate(category = "live at berlin") 
   )%>%
-  select(c(36, "category", 50, 6:16))
-
+  select(c(36, "category", 50, 6:16)) %>% 
+  mutate(track.name = str_sub(track.name, 1,-8))
 
 rammstein_not_live <- get_playlist_audio_features("","0A0m04BWQCIozwguPMaRzE") %>%
   select(c(36, 50, 6:16))
 
+rammstein_not_live[29, "track.name"] = "Wilder Wein"
+
 live_not_live <- bind_rows(
   rammstein_live,
   rammstein_not_live %>% mutate(category = "studio")
+)
+
+live_not_live <- live_not_live %>% mutate(
+  track.name = tolower(track.name)
 )
 
 rammstein_sum <- rammstein%>%
@@ -90,23 +73,222 @@ rammstein_sum <- rammstein%>%
 
 ```
 
+### Why is *Diamant* so different from their other songs?
+
+***
+
+As mentioned before, *diamant* is a very atipical song from Rammstein since it sound much more like a full on ballad than a heavy metal song. To see how this song differs from a more typical Rammstein song like *Du hast* or *Links 2 3 4 *, the chroma-based and timbre-based self-similarity matrices for these songs are shown. What stands out is that *Du hast* and *Links 2 3 4* have a much more clear structure and when listening to the songs the patterns are very recognizable. *Diamant* on the other hand has a much more complex structure and when listening to the song it is hard to recognize the patterns from the matrix.
+
+
+#### Diamant
+
+```{r}
+diamant <-
+  get_tidy_audio_analysis("1UZs9dauJnxrqYxMIzxnwC") %>%
+  compmus_align(bars, segments) %>%
+  select(bars) %>%
+  unnest(bars) %>%
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "acentre", norm = "manhattan"
+      )
+  ) %>%
+  mutate(
+    timbre =
+      map(segments,
+        compmus_summarise, timbre,
+        method = "mean"
+      )
+  )
+bind_rows(
+  diamant %>%
+    compmus_self_similarity(pitches, "aitchison") %>%
+    mutate(d = d / max(d), type = "Chroma"),
+  diamant %>%
+    compmus_self_similarity(timbre, "euclidean") %>%
+    mutate(d = d / max(d), type = "Timbre")
+) %>%
+  mutate() %>%
+  ggplot(
+    aes(
+      x = xstart + xduration / 2,
+      width = xduration,
+      y = ystart + yduration / 2,
+      height = yduration,
+      fill = d
+    )
+  ) +
+  geom_tile() +
+  coord_fixed() +
+  facet_wrap(~type) +
+  scale_fill_viridis_c(guide = "none") +
+  theme_classic() +
+  labs(x = "", y = "")
+```
+
+
+
+
+#### Du hast
+
+```{r echo = FALSE}
+du_hast <-
+  get_tidy_audio_analysis("5awDvzxWfd53SSrsRZ8pXO") %>%
+  compmus_align(bars, segments) %>%
+  select(bars) %>%
+  unnest(bars) %>%
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "acentre", norm = "manhattan"
+      )
+  ) %>%
+  mutate(
+    timbre =
+      map(segments,
+        compmus_summarise, timbre,
+        method = "mean"
+      )
+  )
+bind_rows(
+  du_hast %>%
+    compmus_self_similarity(pitches, "aitchison") %>%
+    mutate(d = d / max(d), type = "Chroma"),
+  du_hast %>%
+    compmus_self_similarity(timbre, "euclidean") %>%
+    mutate(d = d / max(d), type = "Timbre")
+) %>%
+  mutate() %>%
+  ggplot(
+    aes(
+      x = xstart + xduration / 2,
+      width = xduration,
+      y = ystart + yduration / 2,
+      height = yduration,
+      fill = d
+    )
+  ) +
+  geom_tile() +
+  coord_fixed() +
+  facet_wrap(~type) +
+  scale_fill_viridis_c(guide = "none") +
+  theme_classic() +
+  labs(x = "", y = "")
+```
+
+#### Link 2 3 4
+
+```{r echo = FALSE}
+links <-
+  get_tidy_audio_analysis("52XYwQKlXp7scE7KrBBCID") %>%
+  compmus_align(bars, segments) %>%
+  select(bars) %>%
+  unnest(bars) %>%
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "acentre", norm = "manhattan"
+      )
+  ) %>%
+  mutate(
+    timbre =
+      map(segments,
+        compmus_summarise, timbre,
+        method = "mean"
+      )
+  )
+bind_rows(
+  links %>%
+    compmus_self_similarity(pitches, "aitchison") %>%
+    mutate(d = d / max(d), type = "Chroma"),
+  links %>%
+    compmus_self_similarity(timbre, "euclidean") %>%
+    mutate(d = d / max(d), type = "Timbre")
+) %>%
+  mutate() %>%
+  ggplot(
+    aes(
+      x = xstart + xduration / 2,
+      width = xduration,
+      y = ystart + yduration / 2,
+      height = yduration,
+      fill = d
+    )
+  ) +
+  geom_tile() +
+  coord_fixed() +
+  facet_wrap(~type) +
+  scale_fill_viridis_c(guide = "none") +
+  theme_classic() +
+  labs(x = "", y = "")
+```
+
+
+### Introduction
+
+Starting in Berlin in 1994, Rammstein has been around for almost 30 years. With their first album *Herzeleid* released in September 1995, and their lates album *Rammstein* in May 2019, a lot has changed in the music industry since they first started. This raises the question whether their music has changed as well, and if so, how?
+
+To answer this question, a corpus is used which consists of  the seven studio albums from Rammstein (77 tracks);
+
+* *Herzeleid* (1995)
+* *Sehnsucht* (1997)
+* *Mutter* (2001)
+* *Reise, Reise* (2004)
+* *Rosenrot* (2005)
+* *Liebe ist für alle da* (2009)
+* *Rammstein* (2019)
+
+In addition to this two live albums were also included (27 tracks);
+
+* *Live aus Berlin* (1999)
+* *Rammstein: Paris* (2017)
+
+The studio albums were included to see if their music changed over time and if so how? What changed? What did not change through all those years? Are there similarities between albums?
+The studio albums are added because it might also be interesting to look at differneces between live and studio albums.
+
+The comparison points in this corpus are between the different studio albums, between the live albums and their corresponding studio tracks and between the live albums.
+
+The corpus is quite representative as there are plenty of albums, and thus tracks, to compare. However, when looking at changes in albums over time, it has to be noted that 6 of the 7 studio albums were released in a 14 year time period (1995-2009), and in the last 12 years only one album has been released.
+
+A few tracks that are atypical are *Diamant* (*Rammstein*, 2019), *Roter Sand* (*Liebe ist für alle da*, 2009), *Los* (*Reise, Reise*, 2004) and *Ein Lied* (*Rosenrot*, 2005). *Diamant* and *Roter Sand* have sound a lot more like ballads than the industrial metal we're used from Rammstein. *Los* and *Ein Lied* both have a more slow, easy going tempo and have less distortion than other songs in the corpus.
+
+
+
 
 ### What changed between the first and last album from Rammstein?
 
 
 ```{r echo = FALSE}
 rammstein_2019 <- rammstein %>%
-  filter(track.album.release_date == "2019-05-17")
+  filter(track.album.release_date == "2019")
 
 rammstein_1995 <- rammstein %>%
-  filter(track.album.release_date == "1995-09-24")
+  filter(track.album.release_date == "1995")
 
 rammstein_first_last <- bind_rows(rammstein_1995, rammstein_2019)
 
-rammstein_f_l_val <- ggplot(rammstein_first_last, aes(valence, danceability, color=track.album.release_date, size=instrumentalness, label=track.name))+
-  geom_point() 
+rammstein_f_l_val <- ggplot(rammstein_first_last, aes(valence, danceability, color=factor(track.album.release_date), size=instrumentalness, label=track.name))+
+  geom_point() +
+  theme(legend.title = element_blank())
 
-ggplotly(rammstein_f_l_val)
+ggplotly(rammstein_f_l_val)%>%
+  layout(legend = list(
+      orientation = "v",
+      x = "auto",
+      font = list(
+        family = "sans-serif",
+        size = 15,
+        color = "#000"),
+      bgcolor = "#E2E2E2",
+      bordercolor = "#FFFFFF",
+      borderwidth = 2
+    )
+  ) %>%
+  layout(legend=list(title=list(text=' Instrumentalness')))
 ```
 
 
@@ -122,7 +304,8 @@ The features with the most change are danceability, valence and instrumentalness
 
 ```{r echo=FALSE}
 rammstein_dance_val <- ggplot(rammstein, aes(track.album.release_date, danceability, size=valence, color=instrumentalness, label=track.name)) +
-  geom_point(alpha = 0.5) 
+  geom_point(alpha = 0.5)
+ 
 
 rammstein_dance_val
 ```
@@ -138,22 +321,42 @@ The last album has the most variation in danceablity and valence. However, the i
 
 
 ### Comparing live tracks to studio tracks.
+```{r}
+#live_not_live[["track.name"]]
+
+```
 
 
 ```{r echo=FALSE}
 
-
 rammstein_live_not_live <- ggplot(live_not_live, aes(valence, danceability, size=instrumentalness, color=category, label=track.name)) +
-  geom_point(alpha=0.81) 
+  geom_point(alpha=0.6) + 
+  geom_path(aes(group=track.name), size = 0.05, color="black")+
+  theme(legend.title = element_blank())
 
 
-ggplotly(rammstein_live_not_live)
+
+ggplotly(rammstein_live_not_live)%>%
+  layout(legend = list(
+      orientation = "v",
+      x = "auto",
+      itemizing = "trace",
+      font = list(
+        family = "sans-serif",
+        size = 15,
+        color = "#000"),
+      bgcolor = "#E2E2E2",
+      bordercolor = "#FFFFFF",
+      borderwidth = 2
+    )
+  ) %>%
+  layout(legend=list(title=list(text=' Instrumentalness')))
 ```
 
 *** 
 When comparing the live tracks, both from Berlin (1999) and from Paris (2017), to the studio tracks it is clear that the studio tracks have a higher valence and more danceability.
 
-Note: I am trying to draw lines between tracks with the same name but have not figured out yet how to do that, but I hope that once I add that this visualization will provide some more insight.
+Different versions of the tracks are connected with lines. Which show that there is definitely some difference between the two live albums and between the live and studio tracks.
 
 
 
