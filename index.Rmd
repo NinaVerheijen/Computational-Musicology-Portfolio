@@ -223,15 +223,15 @@ bind_rows(
   theme_classic() +
   labs(x = "", y = "")
 ```
-***
 
-As mentioned before, *diamant* is a very atipical song from Rammstein since it sound much more like a full on ballad than a heavy metal song. To see how this song differs from a more typical Rammstein song like *Du hast* or *Links 2 3 4 *, the chroma-based and timbre-based self-similarity matrices for these songs are shown. What stands out is that *Du hast* and *Links 2 3 4* have a much more clear structure and when listening to the songs the patterns are very recognizable. *Diamant* on the other hand has a much more complex structure and when listening to the song it is hard to recognize the patterns from the matrix.
+
+As mentioned before, *diamant* is a very atypical song from Rammstein since it sound much more like a full on ballad than a heavy metal song. To see how this song differs from a more typical Rammstein song like *Du hast* or *Links 2 3 4 *, the chroma-based and timbre-based self-similarity matrices for these songs are shown. What stands out is that *Du hast* and *Links 2 3 4* have a much more clear structure and when listening to the songs the patterns are very recognizable. *Diamant* on the other hand has a much more complex structure and when listening to the song it is hard to recognize the patterns from the matrix.
 
 
 
 ### Introduction
 
-Starting in Berlin in 1994, Rammstein has been around for almost 30 years. With their first album *Herzeleid* released in September 1995, and their lates album *Rammstein* in May 2019, a lot has changed in the music industry since they first started. This raises the question whether their music has changed as well, and if so, how?
+Starting in Berlin in 1994, Rammstein has been around for almost 30 years. With their first album *Herzeleid* released in September 1995, and their latest album *Rammstein* in May 2019, a lot has changed in the music industry since they first started. This raises the question whether their music has changed as well, and if so, how?
 
 To answer this question, a corpus is used which consists of  the seven studio albums from Rammstein (77 tracks);
 
@@ -322,15 +322,11 @@ The last album has the most variation in danceablity and valence. However, the i
 
 
 ### Comparing live tracks to studio tracks.
-```{r}
-#live_not_live[["track.name"]]
-
-```
 
 
 ```{r echo=FALSE}
 
-rammstein_live_not_live <- ggplot(live_not_live, aes(valence, danceability, size=instrumentalness, color=category, label=track.name)) +
+rammstein_live_not_live <- ggplot(live_not_live, aes(valence, energy, size=liveness, color=category, label=track.name)) +
   geom_point(alpha=0.6) + 
   geom_path(aes(group=track.name), size = 0.05, color="black")+
   theme(legend.title = element_blank())
@@ -351,13 +347,13 @@ ggplotly(rammstein_live_not_live)%>%
       borderwidth = 2
     )
   ) %>%
-  layout(legend=list(title=list(text=' Instrumentalness')))
+  layout(legend=list(title=list(text=' Liveness')))
 ```
 
 *** 
 When comparing the live tracks, both from Berlin (1999) and from Paris (2017), to the studio tracks it is clear that the studio tracks have a higher valence and more danceability.
 
-Different versions of the tracks are connected with lines. Which show that there is definitely some difference between the two live albums and between the live and studio tracks.
+Different versions of the tracks are connected with lines. Which show that there is definitely some difference between the two live albums and between the live and studio tracks. One obvious difference is that the live tracks have a higher liveness than the studio track. The live album from Berlin seems to have a higher valence than the live album from Paris, which might be explained by the fact that the older albums also have a higher valence than the newer albums. When comparing the live tracks to their corresponding studio track, almost all studio tracks have a higher valence
 
 
 
