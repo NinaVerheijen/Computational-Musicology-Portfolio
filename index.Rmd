@@ -163,7 +163,7 @@ key_templates <-
 ```
 
 
-### nieuw
+### Chordogram
 
 
 #### Los 
@@ -213,7 +213,11 @@ get_tidy_audio_analysis("6bvTzuFABmFnAAmVZ3nlMh") %>%
   theme_minimal() +
   labs(x = "Time (s)", y = "")
 ```
-Comparison of a atypical track (*Los*) to a more typical track (*Reise, Reise*) from Rammstein, both from the album *Reise Reise*.
+
+
+
+
+Comparison of an atypical track (*Los*) to a more typical track (*Reise, Reise*) from Rammstein, both from the album *Reise Reise*. Even though the songs are very different, some similarities can be found in their chordograms. Both show darker lines for the C:7, Eb:7 and Ab;7, and lighter lines around D:min and Bb:maj.
 
 
 
