@@ -34,6 +34,12 @@ rammstein <- all_data_rammstein%>%
   mutate(
     track.album.release_date = lubridate::year(track.album.release_date)
   )
+
+rammstein_2019 <- rammstein %>%
+  filter(track.album.release_date == "2019")
+
+rammstein_1995 <- rammstein %>%
+  filter(track.album.release_date == "1995")
   
 rammstein_live <- bind_rows(
   rammstein_paris %>% mutate(category = "live at paris"),
@@ -221,6 +227,67 @@ Comparison of an atypical track (*Los*) to a more typical track (*Reise, Reise*)
 
 
 
+### Compare first album with last album
+
+
+```{r}
+first <-
+  get_playlist_audio_features(
+    "",
+    "6MPrZZiCfHOPWMFa5OjVhv"
+  ) %>%
+  slice(1:30) %>%
+  add_audio_analysis()
+last <-
+  get_playlist_audio_features(
+    "",
+    "4zHoeSDpe1tLBOnWaTYuZs"
+  ) %>%
+  slice(1:30) %>%
+  add_audio_analysis()
+first_and_last <-
+  first %>%
+  mutate(genre = "Herzeleid (1995)") %>%
+  bind_rows(last %>% mutate(genre = "Rammstein (2019"))
+```
+
+```{r}
+first_and_last %>%
+  mutate(
+    sections =
+      map(
+        sections,                                    # sections or segments
+        summarise_at,
+        vars(tempo, loudness, duration),             # features of interest
+        list(section_mean = mean, section_sd = sd)   # aggregation functions
+      )
+  ) %>%
+  unnest(sections) %>%
+  ggplot(
+    aes(
+      x = tempo,
+      y = tempo_section_sd,
+      colour = genre,
+      alpha = loudness
+    )
+  ) +
+  geom_point(aes(size = duration / 60)) +
+  geom_rug() +
+  theme_minimal() +
+  ylim(0, 5) +
+  labs(
+    x = "Mean Tempo (bpm)",
+    y = "SD Tempo",
+    colour = "Genre",
+    size = "Duration (min)",
+    alpha = "Volume (dBFS)"
+  )
+```
+
+***
+This graph shows the **standard deviation** and the **mean** of the tempo of the tracks of the first album (*Herzeleid*, 1995) and last album (*Rammstein*, 2019). A clear difference can be seen between the first and last album. **The standard deviation of the tempo of the last album is generally higher than the standard deviation of the tempo of the first album.** Furthermore, **the mean tempo of the last album is also higher than the first album,** which is interesting since the danceability of the last album is lower than the first album.
+
+
 ### Introduction
 
 Starting in Berlin in 1994, Rammstein has been around for almost 30 years. With their first album *Herzeleid* released in September 1995, and their latest album *Rammstein* in May 2019, a lot has changed in the music industry since they first started. This raises the question whether their music has changed as well, and if so, how?
@@ -256,11 +323,6 @@ A few tracks that are atypical are *Diamant* (*Rammstein*, 2019), *Roter Sand* (
 
 
 ```{r echo = FALSE}
-rammstein_2019 <- rammstein %>%
-  filter(track.album.release_date == "2019")
-
-rammstein_1995 <- rammstein %>%
-  filter(track.album.release_date == "1995")
 
 rammstein_first_last <- bind_rows(rammstein_1995, rammstein_2019)
 
