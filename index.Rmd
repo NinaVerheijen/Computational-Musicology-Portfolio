@@ -16,6 +16,8 @@ library(tidyverse)
 library(dplyr)
 library(spotifyr)
 library(ggplot2)
+library(grid)
+library(gridExtra)
 library(plotly)
 library(compmus)
 library(Rmisc)
@@ -80,212 +82,40 @@ rammstein_sum <- rammstein%>%
 
 ```
 
-```{r}
-circshift <- function(v, n) {
-  if (n == 0) v else c(tail(v, n), head(v, -n))
-}
 
-#      C     C#    D     Eb    E     F     F#    G     Ab    A     Bb    B
-major_chord <-
-  c(   1,    0,    0,    0,    1,    0,    0,    1,    0,    0,    0,    0)
-minor_chord <-
-  c(   1,    0,    0,    1,    0,    0,    0,    1,    0,    0,    0,    0)
-seventh_chord <-
-  c(   1,    0,    0,    0,    1,    0,    0,    1,    0,    0,    1,    0)
+### Tempograms
 
-major_key <-
-  c(6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88)
-minor_key <-
-  c(6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17)
-
-chord_templates <-
-  tribble(
-    ~name, ~template,
-    "Gb:7", circshift(seventh_chord, 6),
-    "Gb:maj", circshift(major_chord, 6),
-    "Bb:min", circshift(minor_chord, 10),
-    "Db:maj", circshift(major_chord, 1),
-    "F:min", circshift(minor_chord, 5),
-    "Ab:7", circshift(seventh_chord, 8),
-    "Ab:maj", circshift(major_chord, 8),
-    "C:min", circshift(minor_chord, 0),
-    "Eb:7", circshift(seventh_chord, 3),
-    "Eb:maj", circshift(major_chord, 3),
-    "G:min", circshift(minor_chord, 7),
-    "Bb:7", circshift(seventh_chord, 10),
-    "Bb:maj", circshift(major_chord, 10),
-    "D:min", circshift(minor_chord, 2),
-    "F:7", circshift(seventh_chord, 5),
-    "F:maj", circshift(major_chord, 5),
-    "A:min", circshift(minor_chord, 9),
-    "C:7", circshift(seventh_chord, 0),
-    "C:maj", circshift(major_chord, 0),
-    "E:min", circshift(minor_chord, 4),
-    "G:7", circshift(seventh_chord, 7),
-    "G:maj", circshift(major_chord, 7),
-    "B:min", circshift(minor_chord, 11),
-    "D:7", circshift(seventh_chord, 2),
-    "D:maj", circshift(major_chord, 2),
-    "F#:min", circshift(minor_chord, 6),
-    "A:7", circshift(seventh_chord, 9),
-    "A:maj", circshift(major_chord, 9),
-    "C#:min", circshift(minor_chord, 1),
-    "E:7", circshift(seventh_chord, 4),
-    "E:maj", circshift(major_chord, 4),
-    "G#:min", circshift(minor_chord, 8),
-    "B:7", circshift(seventh_chord, 11),
-    "B:maj", circshift(major_chord, 11),
-    "D#:min", circshift(minor_chord, 3)
-  )
-
-key_templates <-
-  tribble(
-    ~name, ~template,
-    "Gb:maj", circshift(major_key, 6),
-    "Bb:min", circshift(minor_key, 10),
-    "Db:maj", circshift(major_key, 1),
-    "F:min", circshift(minor_key, 5),
-    "Ab:maj", circshift(major_key, 8),
-    "C:min", circshift(minor_key, 0),
-    "Eb:maj", circshift(major_key, 3),
-    "G:min", circshift(minor_key, 7),
-    "Bb:maj", circshift(major_key, 10),
-    "D:min", circshift(minor_key, 2),
-    "F:maj", circshift(major_key, 5),
-    "A:min", circshift(minor_key, 9),
-    "C:maj", circshift(major_key, 0),
-    "E:min", circshift(minor_key, 4),
-    "G:maj", circshift(major_key, 7),
-    "B:min", circshift(minor_key, 11),
-    "D:maj", circshift(major_key, 2),
-    "F#:min", circshift(minor_key, 6),
-    "A:maj", circshift(major_key, 9),
-    "C#:min", circshift(minor_key, 1),
-    "E:maj", circshift(major_key, 4),
-    "G#:min", circshift(minor_key, 8),
-    "B:maj", circshift(major_key, 11),
-    "D#:min", circshift(minor_key, 3)
-  )
-```
-
-
-### Chordogram
-
-
-#### Los 
 
 ```{r}
-get_tidy_audio_analysis("6IUhPMJf4iJQ3Go1CkHDsa") %>%
-  compmus_align(bars, segments) %>%
-  select(bars) %>%
-  unnest(bars) %>%
-  mutate(
-    pitches =
-      map(segments,
-        compmus_summarise, pitches,
-        method = "mean", norm = "manhattan"
-      )
-  ) %>% 
-  compmus_match_pitch_template(chord_templates, "euclidean", "manhattan") %>%
-  ggplot(
-    aes(x = start + duration / 2, width = duration, y = name, fill = d)
-  ) +
-  geom_tile() +
+
+weit_weg <- get_tidy_audio_analysis("6PJasPKAzNLSOzxeAH33j2")
+
+weit_weg_big <- weit_weg %>%
+  tempogram(window_size = 8, hop_size = 1, cyclic = FALSE) %>%
+  ggplot(aes(x = time, y = bpm, fill = power)) +
+  geom_raster() +
   scale_fill_viridis_c(guide = "none") +
-  theme_minimal() +
-  labs(x = "Time (s)", y = "")
-```
+  labs(x = "Time (s)", y = "Tempo (BPM)") +
+  theme_classic()
 
-#### Reise reise
 
-```{r}
-get_tidy_audio_analysis("6bvTzuFABmFnAAmVZ3nlMh") %>%
-  compmus_align(bars, segments) %>%
-  select(bars) %>%
-  unnest(bars) %>%
-  mutate(
-    pitches =
-      map(segments,
-        compmus_summarise, pitches,
-        method = "mean", norm = "manhattan"
-      )
-  ) %>% 
-  compmus_match_pitch_template(chord_templates, "euclidean", "manhattan") %>%
-  ggplot(
-    aes(x = start + duration / 2, width = duration, y = name, fill = d)
-  ) +
-  geom_tile() +
+
+weit_weg_cycle <- weit_weg %>%
+  tempogram(window_size = 8, hop_size = 1, cyclic = TRUE) %>%
+  ggplot(aes(x = time, y = bpm, fill = power)) +
+  geom_raster() +
   scale_fill_viridis_c(guide = "none") +
-  theme_minimal() +
-  labs(x = "Time (s)", y = "")
-```
+  labs(x = "Time (s)", y = "Tempo (BPM)") +
+  theme_classic()
 
+grid.arrange(weit_weg_big, weit_weg_cycle, ncol=2)
 
-
-
-Comparison of an atypical track (*Los*) to a more typical track (*Reise, Reise*) from Rammstein, both from the album *Reise Reise*. Even though the songs are very different, some similarities can be found in their chordograms. Both show darker lines for the C:7, Eb:7 and Ab;7, and lighter lines around D:min and Bb:maj.
-
-
-
-### Compare first album with last album
-
-
-```{r}
-first <-
-  get_playlist_audio_features(
-    "",
-    "6MPrZZiCfHOPWMFa5OjVhv"
-  ) %>%
-  slice(1:30) %>%
-  add_audio_analysis()
-last <-
-  get_playlist_audio_features(
-    "",
-    "4zHoeSDpe1tLBOnWaTYuZs"
-  ) %>%
-  slice(1:30) %>%
-  add_audio_analysis()
-first_and_last <-
-  first %>%
-  mutate(genre = "Herzeleid (1995)") %>%
-  bind_rows(last %>% mutate(genre = "Rammstein (2019"))
-```
-
-```{r}
-first_and_last %>%
-  mutate(
-    sections =
-      map(
-        sections,                                    # sections or segments
-        summarise_at,
-        vars(tempo, loudness, duration),             # features of interest
-        list(section_mean = mean, section_sd = sd)   # aggregation functions
-      )
-  ) %>%
-  unnest(sections) %>%
-  ggplot(
-    aes(
-      x = tempo,
-      y = tempo_section_sd,
-      colour = genre,
-      alpha = loudness
-    )
-  ) +
-  geom_point(aes(size = duration / 60)) +
-  geom_rug() +
-  theme_minimal() +
-  ylim(0, 5) +
-  labs(
-    x = "Mean Tempo (bpm)",
-    y = "SD Tempo",
-    colour = "Genre",
-    size = "Duration (min)",
-    alpha = "Volume (dBFS)"
-  )
 ```
 
 ***
-This graph shows the **standard deviation** and the **mean** of the tempo of the tracks of the first album (*Herzeleid*, 1995) and last album (*Rammstein*, 2019). A clear difference can be seen between the first and last album. **The standard deviation of the tempo of the last album is generally higher than the standard deviation of the tempo of the first album.** Furthermore, **the mean tempo of the last album is also higher than the first album,** which is interesting since the danceability of the last album is lower than the first album.
+
+The graph in tab about changes in tempo between the first and last album indicates that *Weit weg* has a mean tempo of 202 bpm. Which is surprising since the track is actually not that fast in tempo.To get a better understanding of why spotify gave it such a high mean tempo, the tempogram of the track is plotted.
+
 
 
 ### Introduction
@@ -340,10 +170,11 @@ ggplotly(rammstein_f_l_val)%>%
         color = "#000"),
       bgcolor = "#E2E2E2",
       bordercolor = "#FFFFFF",
-      borderwidth = 2
+      borderwidth = 2,
+      title=list(text="Instrumentalness")
     )
-  ) %>%
-  layout(legend=list(title=list(text=' Instrumentalness')))
+  )
+
 ```
 
 
@@ -372,6 +203,82 @@ To see if this was also the case when looking at all albums, the valence, dancea
 
 The last album has the most variation in danceablity and valence. However, the instrumentalness stays quit the same for most tracks in the last album.
 
+
+
+### Changes in tempo between first and last album.
+
+
+```{r}
+first <-
+  get_playlist_audio_features(
+    "",
+    "6MPrZZiCfHOPWMFa5OjVhv"
+  ) %>%
+  slice(1:30) %>%
+  add_audio_analysis()
+last <-
+  get_playlist_audio_features(
+    "",
+    "4zHoeSDpe1tLBOnWaTYuZs"
+  ) %>%
+  slice(1:30) %>%
+  add_audio_analysis()
+```
+
+```{r}
+first_and_last <-
+  first %>%
+  mutate(genre = "Herzeleid (1995)") %>%
+  bind_rows(last %>% mutate(genre = "Rammstein (2019)")) %>%
+  mutate(
+    sections =
+      map(
+        sections,                                    # sections or segments
+        summarise_at,
+        vars(tempo, loudness, duration),             # features of interest
+        list(section_mean = mean, section_sd = sd)   # aggregation functions
+      )
+  ) %>%
+  unnest(sections)
+
+
+test <-
+  ggplot(first_and_last,
+    aes(
+      x = tempo,
+      y = tempo_section_sd,
+      colour = genre,
+      label = track.name
+    )
+  ) +
+  geom_point(size=4, alpha=0.6) +
+  geom_rug() +
+  theme_minimal() +
+  ylim(0, 5) +
+  labs(
+    x = "Mean Tempo (bpm)",
+    y = "SD Tempo",
+    colour = "Genre"
+  )  
+
+ggplotly(test) %>%
+  layout(legend = list(
+      orientation = "v",
+      x = "auto",
+      font = list(
+        family = "sans-serif",
+        size = 15,
+        color = "#000"),
+      bgcolor = "#E2E2E2",
+      bordercolor = "#FFFFFF",
+      borderwidth = 2,
+      title=list(text="Album")
+    )
+  )
+```
+
+***
+This graph shows the **standard deviation** and the **mean** of the tempo of the tracks of the first album (*Herzeleid*, 1995) and last album (*Rammstein*, 2019). A clear difference can be seen between the first and last album. **The standard deviation of the tempo of the last album is generally higher than the standard deviation of the tempo of the first album.** Furthermore, **the mean tempo of the last album is also higher than the first album,** which is interesting since the danceability of the last album is lower than the first album.
 
 
 
@@ -611,6 +518,152 @@ bind_rows(
 As mentioned before, *diamant* is a very atypical song from Rammstein since it sound much more like a full on ballad than a heavy metal song. To see how this song differs from a more typical Rammstein song like *Du hast* or *Links 2 3 4 *, the chroma-based and timbre-based self-similarity matrices for these songs are shown. What stands out is that *Du hast* and *Links 2 3 4* have a much more clear structure and when listening to the songs the patterns are very recognizable. *Diamant* on the other hand has a much more complex structure and when listening to the song it is hard to recognize the patterns from the matrix.
 
 When looking at the timbre based self-similarity matrices, *Du hast* and *Links 2 3 4* have more dark blocks, meaning more homogeneity within the timeframes. Whereas *Diamant* has more vertical yellow lines, indicating more novelties. Besides that, *Diamant* also has a lot of diagonal lines in the chroma based matrix and only a vaguely visible checkerboard pattern, which indicates that a melodic phrase or passage is repeated in different parts of the song. It starts of with just guitar and voice and adds more and more strings as the song progresses. The other two tracks both start with an intro, but after that only have a few vertical lines, thus only a few novelties.
+
+
+
+
+
+```{r}
+circshift <- function(v, n) {
+  if (n == 0) v else c(tail(v, n), head(v, -n))
+}
+
+#      C     C#    D     Eb    E     F     F#    G     Ab    A     Bb    B
+major_chord <-
+  c(   1,    0,    0,    0,    1,    0,    0,    1,    0,    0,    0,    0)
+minor_chord <-
+  c(   1,    0,    0,    1,    0,    0,    0,    1,    0,    0,    0,    0)
+seventh_chord <-
+  c(   1,    0,    0,    0,    1,    0,    0,    1,    0,    0,    1,    0)
+
+major_key <-
+  c(6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88)
+minor_key <-
+  c(6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17)
+
+chord_templates <-
+  tribble(
+    ~name, ~template,
+    "Gb:7", circshift(seventh_chord, 6),
+    "Gb:maj", circshift(major_chord, 6),
+    "Bb:min", circshift(minor_chord, 10),
+    "Db:maj", circshift(major_chord, 1),
+    "F:min", circshift(minor_chord, 5),
+    "Ab:7", circshift(seventh_chord, 8),
+    "Ab:maj", circshift(major_chord, 8),
+    "C:min", circshift(minor_chord, 0),
+    "Eb:7", circshift(seventh_chord, 3),
+    "Eb:maj", circshift(major_chord, 3),
+    "G:min", circshift(minor_chord, 7),
+    "Bb:7", circshift(seventh_chord, 10),
+    "Bb:maj", circshift(major_chord, 10),
+    "D:min", circshift(minor_chord, 2),
+    "F:7", circshift(seventh_chord, 5),
+    "F:maj", circshift(major_chord, 5),
+    "A:min", circshift(minor_chord, 9),
+    "C:7", circshift(seventh_chord, 0),
+    "C:maj", circshift(major_chord, 0),
+    "E:min", circshift(minor_chord, 4),
+    "G:7", circshift(seventh_chord, 7),
+    "G:maj", circshift(major_chord, 7),
+    "B:min", circshift(minor_chord, 11),
+    "D:7", circshift(seventh_chord, 2),
+    "D:maj", circshift(major_chord, 2),
+    "F#:min", circshift(minor_chord, 6),
+    "A:7", circshift(seventh_chord, 9),
+    "A:maj", circshift(major_chord, 9),
+    "C#:min", circshift(minor_chord, 1),
+    "E:7", circshift(seventh_chord, 4),
+    "E:maj", circshift(major_chord, 4),
+    "G#:min", circshift(minor_chord, 8),
+    "B:7", circshift(seventh_chord, 11),
+    "B:maj", circshift(major_chord, 11),
+    "D#:min", circshift(minor_chord, 3)
+  )
+
+key_templates <-
+  tribble(
+    ~name, ~template,
+    "Gb:maj", circshift(major_key, 6),
+    "Bb:min", circshift(minor_key, 10),
+    "Db:maj", circshift(major_key, 1),
+    "F:min", circshift(minor_key, 5),
+    "Ab:maj", circshift(major_key, 8),
+    "C:min", circshift(minor_key, 0),
+    "Eb:maj", circshift(major_key, 3),
+    "G:min", circshift(minor_key, 7),
+    "Bb:maj", circshift(major_key, 10),
+    "D:min", circshift(minor_key, 2),
+    "F:maj", circshift(major_key, 5),
+    "A:min", circshift(minor_key, 9),
+    "C:maj", circshift(major_key, 0),
+    "E:min", circshift(minor_key, 4),
+    "G:maj", circshift(major_key, 7),
+    "B:min", circshift(minor_key, 11),
+    "D:maj", circshift(major_key, 2),
+    "F#:min", circshift(minor_key, 6),
+    "A:maj", circshift(major_key, 9),
+    "C#:min", circshift(minor_key, 1),
+    "E:maj", circshift(major_key, 4),
+    "G#:min", circshift(minor_key, 8),
+    "B:maj", circshift(major_key, 11),
+    "D#:min", circshift(minor_key, 3)
+  )
+```
+
+
+### Chordogram
+
+```{r}
+los <- get_tidy_audio_analysis("6IUhPMJf4iJQ3Go1CkHDsa") %>%
+  compmus_align(bars, segments) %>%
+  select(bars) %>%
+  unnest(bars) %>%
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "mean", norm = "manhattan"
+      )
+  ) %>% 
+  compmus_match_pitch_template(chord_templates, "euclidean", "manhattan") %>%
+  ggplot(
+    aes(x = start + duration / 2, width = duration, y = name, fill = d)
+  ) +
+  geom_tile() +
+  scale_fill_viridis_c(guide = "none") +
+  theme_minimal() +
+  labs(x = "Time (s)", y = "")
+
+
+reise <- get_tidy_audio_analysis("6bvTzuFABmFnAAmVZ3nlMh") %>%
+  compmus_align(bars, segments) %>%
+  select(bars) %>%
+  unnest(bars) %>%
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "mean", norm = "manhattan"
+      )
+  ) %>% 
+  compmus_match_pitch_template(chord_templates, "euclidean", "manhattan") %>%
+  ggplot(
+    aes(x = start + duration / 2, width = duration, y = name, fill = d)
+  ) +
+  geom_tile() +
+  scale_fill_viridis_c(guide = "none") +
+  theme_minimal() +
+  labs(x = "Time (s)", y = "")
+
+
+grid.arrange(los, reise, ncol=2)
+
+```
+
+***
+
+Comparison of an atypical track (*Los*) to a more typical track (*Reise, Reise*) from Rammstein, both from the album *Reise Reise*. Even though the songs are very different, some similarities can be found in their chordograms. Both show darker lines for the C:7, Eb:7 and Ab;7, and lighter lines around D:min and Bb:maj.
 
 
 
