@@ -232,7 +232,7 @@ accuracy <- not_live_forest %>% get_pr()
 
 kable(accuracy, col.names=c('Album', 'Precision', 'Recall'), align='lrr', "pipe")
 ```
-Another album that stands out is *ROSENROT (2005)*, since it has zero precision and recall. This is not that surprising, where albums like *Herzeleid* and *Sehnsucht* do not have that much variety in their tracks, the tracks from *ROSENROT* do not have much in common which makes it difficult to classify.
+Another album that stands out is *ROSENROT (2005)*, since it has zero precision and recall. This is not that surprising, where albums like *Herzeleid* and *Sehnsucht* have tracks which sound somewhat similar, the tracks from *ROSENROT* do not have much in common which makes it difficult to classify.
 
 
 
@@ -257,7 +257,7 @@ workflow() %>%
 ```
 
 ***
-To see which features are the most important. The features are ranked on importance using Random Forest. The graph indicates that the c12 timbre component, loudness and the c02 timbre component are the most important.
+To see which features are the most important. The features are ranked on importance using Random Forest. The graph indicates that the **c12 timbre component**, **loudness** and the **c02 timbre component** are the most important.
 
 
 
@@ -300,7 +300,13 @@ not_live_features %>%
 
 ***
 
-The feature set mentioned in the last tab is used to see if a better plot can be made. It looks like *Herzeleid* and *Sehnsucht* both have a higher timbre component 2 than the other albums. *LIEBE IST FüR ALLE DA* is higher on component 12, especially the tracks *FRÜHLING IN PARIS* and *ROTER SAND*. That would explain why those albums can be better classified. It also shows that *EIN LIED* and *DIAMANT* have a very low component 2 which might explain why their albums *ROsENROT* and *RAMMSTEIN* are more difficult to classify. It is interesting that loudness is mentioned as one of the most important features since in this graphs there is not much difference in loudness, except for *EIN LIED*.
+The feature set mentioned in the last tab is used to see if a better plot can be made. It looks like *Herzeleid* and *Sehnsucht* both have a **higher timbre component 2** than the other albums. 
+
+*LIEBE IST FüR ALLE DA* is **higher on component 12**, especially the tracks *FRÜHLING IN PARIS* and *ROTER SAND*. That would explain why those albums can be better classified. 
+
+It also shows that *EIN LIED* and *DIAMANT* have a **very low component 2** which might explain why their albums *ROsENROT* and *RAMMSTEIN* are more difficult to classify. 
+
+It is interesting that **loudness** is mentioned as one of the most important features since in this graphs there is not much difference in loudness, except for *EIN LIED*.
 
 ### Introduction
 
