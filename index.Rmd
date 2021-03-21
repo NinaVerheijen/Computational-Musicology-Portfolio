@@ -225,7 +225,7 @@ not_live_forest %>% get_conf_mat() %>% autoplot(type = "heatmap") +
 ```
 
 *** 
-To see if some of the albums from Rammstein stand out, a **Random Forest classifier** was used to see how well the tracks can be linked to their album. The confusion matrix indicates that tracks form *Herzeleid (1995)*, *Sehnsucht (1997)* and *LIEBE IST FüR ALLE DA (2009)* are easier to classify than tracks from their other albums. This can also be seen in the accuracy score.** *Herzeleid*, *LIEBE IST FüR ALLE DA* and *Sehnsucht* have higher precision and recall than the other albums.**  
+To see if some of the albums from Rammstein stand out, a **Random Forest classifier** was used to see how well the tracks can be linked to their album. The confusion matrix indicates that tracks form *Herzeleid (1995)*, *Sehnsucht (1997)* and *LIEBE IST FüR ALLE DA (2009)* are easier to classify than tracks from their other albums. This can also be seen in the accuracy score. __The albums *Herzeleid*, *LIEBE IST FüR ALLE DA* and *Sehnsucht* have higher precision and recall than the other albums.__  
 
 ```{r}
 accuracy <- not_live_forest %>% get_pr()
