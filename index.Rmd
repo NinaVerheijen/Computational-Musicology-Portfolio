@@ -429,6 +429,7 @@ test <-
     )
   ) +
   geom_point(size=4, alpha=0.6) +
+  scale_colour_manual(values = c("red","yellow", "orange","pink", "purple", "blue", "green")) +
   geom_rug() +
   theme_minimal() +
   ylim(0, 5) +
@@ -455,10 +456,17 @@ ggplotly(test) %>%
 ```
 
 ***
-This graph shows the **standard deviation** and the **mean** of the tempo of the tracks of the first album (*Herzeleid*, 1995) and last album (*Rammstein*, 2019). A clear difference can be seen between the first and last album. **The standard deviation of the tempo of the last album is generally higher than the standard deviation of the tempo of the first album.** Furthermore, **the mean tempo of the last album is also higher than the first album,** which is interesting since the danceability of the last album is lower than the first album.
+This graph shows the **standard deviation** and the **mean** of the tempo of the albums. What is interesting is the increase in the standard deviation of the tempo over time. The first two albums do not have much variance in tempo. After the second album the variance in tempo starts to increase, especially for the albums **ROSENROT** and **LIEBE IST FÜR ALLE DA**.
+
+When looking at th mean tempo, not much changes over time, the only thing that stands out is the track **WEIT WEG** from the album **RAMMSTEIN**. According to spotify **WEIT WEG** has a mean tempo of 202 bpm, which is really high, especially since the track is not that fast in tempo.
 
 
-### Tempograms
+
+
+
+
+
+### Why does Spotify give **WEIT WEG** such a high tempo?
 
 
 ```{r out.width = "100%"}
@@ -471,7 +479,7 @@ include_graphics(temp_path)
 
 ***
 
-The graph in the tab about changes in tempo between the first and last album indicates that [*Weit weg*](https://open.spotify.com/track/0sMmtnF7by7WPNeRXCam9H?si=_KUDF8oETGaTsCY6k70F2A) has a mean tempo of 202 bpm. Which is surprising since the track is actually not that fast in tempo.To get a better understanding of why Spotify gave it such a high mean tempo, the tempogram of the track is plotted. The left tempogram is the same tempogram as on the right but wrapped into a cyclic tempogram to see more details.
+To get a better understanding of why Spotify gave [*Weit weg*](https://open.spotify.com/track/0sMmtnF7by7WPNeRXCam9H?si=_KUDF8oETGaTsCY6k70F2A) such a high mean tempo, the tempogram of the track is plotted. The left tempogram is the same tempogram as on the right but wrapped into a cyclic tempogram to see more details.
 
 For the first twenty seconds a yellow line can be seen at around 160 bpm in both tempograms. After twenty seconds a yellow line can be seen on the left graph at around 150 bpm while at the right graph the yellow line is at around 250 bpm. In the left graph a vague line can be seen at around 100 bpm which is closer to the actual tempo of the track. Spotify might pick up the somewhat fast drum in the background and based on that give this track such a high mean tempo. Especially since this rhythm is repeated multiple times through the track.
 
@@ -577,7 +585,7 @@ heatmaply(
   hclust_method = "complete",  # Change for single, average, or complete linkage.
   dist_method = "manhattan"
   )%>%
-  layout(autosize = F, width = 800, height = 1000)  
+  layout(autosize = F, width = 800, height = 900)  
 ```
 
 
@@ -593,11 +601,8 @@ ramm_dist %>%
 ```
 
 
-__this is a test__:
-more tests    
+Looking at the __Dendogram__, one small cluster on the right and a much bigger cluster on the left. The cluster on the right contains the tracks *ROTER SAND*, *Diamant* and *EIN LIED*. All these three tracks were also marked as atypical Rammstein tracks in the introduction. Looking at the __heatmap__ these tracks stand out because they are the only one with acousticness.
 
-- 1
-- 2
 
 
 
