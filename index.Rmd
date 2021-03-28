@@ -352,13 +352,13 @@ rammstein_dance_val
 
 ***
 
-To see how the albums chagnes over time, the valence, danceability and instrumentalness were plotted for each album. It is clear that the danceability decreases over time, and with that the valence and instrumentalness as well.
+To see how the albums change over time, the valence, danceability and instrumentalness are plotted for each album. It is clear that the danceability decreases over time, and with that the valence and instrumentalness as well.
 
 The last album has the most variation in danceablity and valence. However, the instrumentalness stays quit the same for most tracks in the last album.
 
 
 
-### Changes in tempo between first and last album.
+### How did the __tempo__ in the ablums change?
 
 
 ```{r}
@@ -479,9 +479,18 @@ include_graphics(temp_path)
 
 ***
 
-To get a better understanding of why Spotify gave [*Weit weg*](https://open.spotify.com/track/0sMmtnF7by7WPNeRXCam9H?si=_KUDF8oETGaTsCY6k70F2A) such a high mean tempo, the tempogram of the track is plotted. The left tempogram is the same tempogram as on the right but wrapped into a cyclic tempogram to see more details.
+To get a better understanding of why Spotify gave [*Weit weg*](https://open.spotify.com/track/0sMmtnF7by7WPNeRXCam9H?si=_KUDF8oETGaTsCY6k70F2A) such a high mean tempo, the __tempogram__ of the track is plotted. The left tempogram is the same tempogram as on the right but wrapped into a __cyclic tempogram__ to see more details.
 
-For the first twenty seconds a yellow line can be seen at around 160 bpm in both tempograms. After twenty seconds a yellow line can be seen on the left graph at around 150 bpm while at the right graph the yellow line is at around 250 bpm. In the left graph a vague line can be seen at around 100 bpm which is closer to the actual tempo of the track. Spotify might pick up the somewhat fast drum in the background and based on that give this track such a high mean tempo. Especially since this rhythm is repeated multiple times through the track.
+```{=html}
+<object data="https://open.spotify.com/embed/track/0sMmtnF7by7WPNeRXCam9H" width="280" height="140">
+    <embed src="https://open.spotify.com/embed/track/0sMmtnF7by7WPNeRXCam9H" width="280" height="140"></embed>
+</object>
+```
+
+
+For the first twenty seconds a yellow line can be seen at around 160 bpm in both tempograms. After twenty seconds a yellow line can be seen on the left graph at around 150 bpm while at the right graph the yellow line is at around 250 bpm. 
+
+In the left graph a vague line can be seen at around 100 bpm which is closer to the actual tempo of the track. Spotify might pick up the somewhat fast drum in the background and based on that give this track such a high mean tempo. Especially since this rhythm is repeated multiple times through the track.
 
 
 ### Comparing live tracks to studio tracks.
@@ -520,7 +529,7 @@ Different versions of the tracks are connected with lines. Which show that there
 
 
 
-### clustering{data-commentary-width=600}
+### Can Rammsteins oeuvre be categorized in clusters?{data-commentary-width=700}
 
 
 ```{r}
@@ -585,7 +594,7 @@ heatmaply(
   hclust_method = "complete",  # Change for single, average, or complete linkage.
   dist_method = "manhattan"
   )%>%
-  layout(autosize = F, width = 800, height = 900)  
+  layout(autosize = F, width = 800, height = 800)  
 ```
 
 
@@ -601,7 +610,9 @@ ramm_dist %>%
 ```
 
 
-Looking at the __Dendogram__, one small cluster on the right and a much bigger cluster on the left. The cluster on the right contains the tracks *ROTER SAND*, *Diamant* and *EIN LIED*. All these three tracks were also marked as atypical Rammstein tracks in the introduction. Looking at the __heatmap__ these tracks stand out because they are the only one with acousticness.
+Looking at the __Dendogram__, one small cluster on the right and a much bigger cluster on the left. The cluster on the right contains the tracks *ROTER SAND*, *Diamant* and *EIN LIED*. All these three tracks were also marked as atypical Rammstein tracks in the introduction. Looking at the __Heatmap__ these tracks stand out because they are the only one with acousticness. They also seem to be the lowest on loudness. 
+
+Besides that it is difficult to see how the other clusters are formed since there are not much clusters that stand out in the __Heatmap__. 
 
 
 
@@ -912,7 +923,7 @@ Comparison of an atypical track (*Los*) to a more typical track (*Reise, Reise*)
 
 
 ### Conclusion
-to do
+In conclusion, Rammsteins music definitely changed between their first and latest album. Danceability and valence both decrease over time. On the other hand, the varience in tempo gets higher over time. Their are some atypical tracks in their albums but there is not enough difference between tracks to make distinct clusters.
 
 
 
