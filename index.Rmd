@@ -90,223 +90,6 @@ rammstein_sum <- rammstein%>%
 
 
 
-```{r}
-get_conf_mat <- function(fit) {
-  outcome <- .get_tune_outcome_names(fit)
-  fit %>% 
-    collect_predictions() %>% 
-    conf_mat(truth = outcome, estimate = .pred_class)
-}  
-
-get_pr <- function(fit) {
-  fit %>% 
-    conf_mat_resampled() %>% 
-    group_by(Prediction) %>% mutate(precision = Freq / sum(Freq)) %>% 
-    group_by(Truth) %>% mutate(recall = Freq / sum(Freq)) %>% 
-    ungroup() %>% filter(Prediction == Truth) %>% 
-    select(class = Prediction, precision, recall)
-}  
-```
-
-```{r}
-ramm <- 
-  get_playlist_audio_features("","4zHoeSDpe1tLBOnWaTYuZs")
-LIFAD <- 
-  get_playlist_audio_features("", "5uJSCBbKMkJlFGhpIVAEKL")
-rosenrot <- 
-  get_playlist_audio_features("", "450ruWPhAMlGcgmTpELaJY")
-reise <- 
-  get_playlist_audio_features("", "1sw0say7N84xGnljIUvFxW")
-mutter <- 
-  get_playlist_audio_features("", "6I3LPUsJrAyFJX9M25ocM3")
-sehnucht <- 
-  get_playlist_audio_features("", "1hRBY4y59Tj6MNm5aW2AbH")
-herzeleid <- 
-  get_playlist_audio_features("", "6MPrZZiCfHOPWMFa5OjVhv")
-
-
-all_not_live <-
-  bind_rows(
-    ramm %>% mutate(playlist = "RAMMSTEIN"),
-    LIFAD %>% mutate(playlist = "LIEBE IST FÜR ALLE DA"),
-    rosenrot %>% mutate(playlist = "ROSENROT"),
-    reise %>% mutate(playlist = "REISE, REISE"),
-    mutter %>% mutate(playlist = "Mutter"),
-    sehnucht %>% mutate(playlist = "Sehnsucht"),
-    herzeleid %>% mutate(playlist = "Herzeleid")
-    
-  ) 
-
-```
-
-
-```{r}
-not_live_features <-
-  all_not_live %>%  # For your portfolio, change this to the name of your corpus.
-  add_audio_analysis() %>% 
-  mutate(
-    playlist = factor(playlist),
-    segments = map2(segments, key, compmus_c_transpose),
-    pitches =
-      map(
-        segments,
-        compmus_summarise, pitches,
-        method = "mean", norm = "manhattan"
-      ),
-    timbre =
-      map(
-        segments,
-        compmus_summarise, timbre,
-        method = "mean",
-      )
-  ) %>%
-  mutate(pitches = map(pitches, compmus_normalise, "clr")) %>%
-  mutate_at(vars(pitches, timbre), map, bind_rows) %>%
-  unnest(cols = c(pitches, timbre))
-
-```
-
-```{r}
-not_live_recipe <-
-  recipe(
-    playlist ~
-      danceability +
-      energy +
-      loudness +
-      speechiness +
-      acousticness +
-      instrumentalness +
-      liveness +
-      valence +
-      tempo +
-      duration +
-      C + `C#|Db` + D + `D#|Eb` +
-      E + `F` + `F#|Gb` + G +
-      `G#|Ab` + A + `A#|Bb` + B +
-      c01 + c02 + c03 + c04 + c05 + c06 +
-      c07 + c08 + c09 + c10 + c11 + c12,
-    data = not_live_features,          # Use the same name as the previous block.
-  ) %>%
-  step_center(all_predictors()) %>%
-  step_scale(all_predictors())      # Converts to z-scores.
-  # step_range(all_predictors())    # Sets range to [0, 1].
-```
-
-
-```{r}
-not_live_cv <- not_live_features %>% vfold_cv(10)
-```
-
-
-
-
-
-```{r}
-forest_model <-
-  rand_forest() %>%
-  set_mode("classification") %>% 
-  set_engine("ranger", importance = "impurity")
-not_live_forest <- 
-  workflow() %>% 
-  add_recipe(not_live_recipe) %>% 
-  add_model(forest_model) %>% 
-  fit_resamples(
-    not_live_cv, 
-    control = control_resamples(save_pred = TRUE)
-  )
-```
-
-### What **features** make albums stand out?
-
-```{r}
-not_live_forest %>% get_conf_mat() %>% autoplot(type = "heatmap") +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))+ggtitle("Confusion matrix") + theme(plot.title = element_text(hjust = 0.5))
-```
-
-*** 
-To see if some of the albums from Rammstein stand out, a **Random Forest classifier** was used to see how well the tracks can be linked to their album. The confusion matrix indicates that tracks form *Herzeleid (1995)*, *Sehnsucht (1997)* and *LIEBE IST FüR ALLE DA (2009)* are easier to classify than tracks from their other albums. This can also be seen in the accuracy score. __The albums *Herzeleid*, *LIEBE IST FüR ALLE DA* and *Sehnsucht* have higher precision and recall than the other albums.__  
-
-```{r}
-accuracy <- not_live_forest %>% get_pr()
-
-kable(accuracy, col.names=c('Album', 'Precision', 'Recall'), align='lrr', "pipe")
-```
-Another album that stands out is *ROSENROT (2005)*, since it has zero precision and recall. This is not that surprising, where albums like *Herzeleid* and *Sehnsucht* have tracks which sound somewhat similar, the tracks from *ROSENROT* do not have much in common which makes it difficult to classify.
-
-
-
-### What features distinguish albums?
-
-```{r}
-workflow() %>% 
-  add_recipe(not_live_recipe) %>% 
-  add_model(forest_model) %>% 
-  fit(not_live_features) %>% 
-  pluck("fit", "fit", "fit") %>%
-  ranger::importance() %>% 
-  enframe() %>% 
-  mutate(name = fct_reorder(name, value)) %>% 
-  ggplot(aes(name, value)) + 
-  geom_col() + 
-  coord_flip() +
-  theme_minimal() +
-  labs(x = NULL, y = "Importance")+
-  ggtitle("Features ranked on importance") + 
-  theme(plot.title = element_text(hjust = 0.5))
-```
-
-***
-To see which features are the most important. The features are ranked on importance using Random Forest. The graph indicates that the **c12 timbre component**, **loudness** and the **c02 timbre component** are the most important.
-
-
-
-### What makes some albums more recognizable than others?
-
-```{r echo=FALSE, warning=FALSE}
-not_live_features %>%
-  ggplot(aes(x = c12, y = c02, colour = playlist, size = loudness, label=track.name)) +
-  geom_point(alpha = 0.8) + 
-  scale_colour_manual(values = c("red","yellow", "orange","pink", "purple", "blue", "green")) +
-  geom_text(                  # Add text labels from above.
-    aes(
-      x = c12,
-      y = c02,
-      label = label
-    ),
-    data = 
-      tibble(
-        label = c("EIN LIED", "DIAMANT", "ROTER SAND", "FRÜHLING IN PARIS"),
-        category = c("ROSENROT", "RAMMSTEIN", "LIEBE IST FüR ALLE DA", "LIEBE IST FüR ALLE DA"),
-        c12 = c(3.8, 3.9, 12.8, 12.5),
-        c02 = c(-66.1,-43.8, -10.1, 29.09)
-      ),
-    colour = "black",         # Override colour (not mode here).
-    size = 2.5,                 # Override size (not loudness here).
-    hjust = "right",           # Align left side of label with the point.
-    vjust = "bottom",         # Align bottom of label with the point.
-    nudge_x = -0.1,          # Nudge the label slightly left.
-    nudge_y = 4            # Nudge the label slightly up.
-  )+
-  labs(
-    x = "Timbre Component 12",
-    y = "Timbre Component 2",
-    size = "loudness",
-    colour = "Album"
-  )
-
-
-```
-
-***
-
-The feature set mentioned in the last tab is used to see if a better plot can be made. It looks like *Herzeleid* and *Sehnsucht* both have a **higher timbre component 2** than the other albums. 
-
-*LIEBE IST FüR ALLE DA* is **higher on component 12**, especially the tracks *FRÜHLING IN PARIS* and *ROTER SAND*. That would explain why those albums can be better classified. 
-
-It also shows that *EIN LIED* and *DIAMANT* have a **very low component 2** which might explain why their albums *ROsENROT* and *RAMMSTEIN* are more difficult to classify. 
-
-It is interesting that **loudness** is mentioned as one of the most important features since in this graphs there is not much difference in loudness, except for *EIN LIED*.
-
 ### Introduction
 
 Starting in Berlin in 1994, Rammstein has been around for almost 30 years. With their first album *Herzeleid* released in September 1995, and their latest album *Rammstein* in May 2019, a lot has changed in the music industry since they first started. This raises the question whether their music has changed as well, and if so, how?
@@ -325,6 +108,12 @@ In addition to this two live albums were also included (27 tracks);
 
 * *Live aus Berlin* (1999)
 * *Rammstein: Paris* (2017)
+
+
+
+![](albums.png)
+
+
 
 The studio albums were included to see if their music changed over time and if so how? What changed? What did not change through all those years? Are there similarities between albums?
 The studio albums are added because it might also be interesting to look at differneces between live and studio albums.
@@ -490,12 +279,6 @@ To get a better understanding of why Spotify gave [*Weit weg*](https://open.spot
 
 
 For the first twenty seconds a yellow line can be seen at around 160 bpm in both tempograms. After twenty seconds a yellow line can be seen on the left graph at around 150 bpm while at the right graph the yellow line is at around 250 bpm. 
-
-
-```{=html}
-<iframe src="https://open.spotify.com/embed/track/0sMmtnF7by7WPNeRXCam9H" width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
-```
-
 
 In the left graph a vague line can be seen at around 100 bpm which is closer to the actual tempo of the track. Spotify might pick up the somewhat fast drum in the background and based on that give this track such a high mean tempo. Especially since this rhythm is repeated multiple times through the track.
 
@@ -777,10 +560,28 @@ bind_rows(
 ```
 
 
-As mentioned before, *diamant* is a very atypical song from Rammstein since it sound much more like a full on ballad than a heavy metal song. To see how this song differs from a more typical Rammstein song like *Du hast* or *Links 2 3 4 *, the chroma-based and timbre-based self-similarity matrices for these songs are shown. What stands out is that *Du hast* and *Links 2 3 4* have a much more clear structure and when listening to the songs the patterns are very recognizable. *Diamant* on the other hand has a much more complex structure and when listening to the song it is hard to recognize the patterns from the matrix.
+```{=html}
+<object data="https://open.spotify.com/embed/track/1UZs9dauJnxrqYxMIzxnwC" width="280" height="80">
+    <embed src="https://open.spotify.com/embed/track/1UZs9dauJnxrqYxMIzxnwC" width="280" height="80"></embed>
+</object>
+```
+
+
+As mentioned before, [*Diamant*](https://open.spotify.com/track/1UZs9dauJnxrqYxMIzxnwC?si=xHwZi-j7Sk-H8A7a8I3nFw) is a very atypical song from Rammstein since it sound much more like a full on ballad than a heavy metal song. To see how this song differs from a more typical Rammstein song like [*Du hast*](https://open.spotify.com/track/5awDvzxWfd53SSrsRZ8pXO?si=RdGH4qPLSMm72TZdoWHu2Q) or [*Links 2 3 4*](https://open.spotify.com/track/52XYwQKlXp7scE7KrBBCID?si=w3hQgOvxStKqxwlWiN0opw), the chroma-based and timbre-based self-similarity matrices for these songs are shown. What stands out is that *Du hast* and *Links 2 3 4* have a much more clear structure and when listening to the songs the patterns are very recognizable. *Diamant* on the other hand has a much more complex structure and when listening to the song it is hard to recognize the patterns from the matrix.
+
+```{=html}
+<object data="https://open.spotify.com/embed/track/5awDvzxWfd53SSrsRZ8pXO" width="280" height="80">
+    <embed src="https://open.spotify.com/embed/track/5awDvzxWfd53SSrsRZ8pXO" width="280" height="80"></embed>
+</object>
+```
 
 When looking at the timbre based self-similarity matrices, *Du hast* and *Links 2 3 4* have more dark blocks, meaning more homogeneity within the timeframes. Whereas *Diamant* has more vertical yellow lines, indicating more novelties. Besides that, *Diamant* also has a lot of diagonal lines in the chroma based matrix and only a vaguely visible checkerboard pattern, which indicates that a melodic phrase or passage is repeated in different parts of the song. It starts of with just guitar and voice and adds more and more strings as the song progresses. The other two tracks both start with an intro, but after that only have a few vertical lines, thus only a few novelties.
 
+```{=html}
+<object data="https://open.spotify.com/embed/track/52XYwQKlXp7scE7KrBBCID" width="280" height="80">
+    <embed src="https://open.spotify.com/embed/track/52XYwQKlXp7scE7KrBBCID" width="280" height="80"></embed>
+</object>
+```
 
 
 
@@ -895,7 +696,7 @@ los <- get_tidy_audio_analysis("6IUhPMJf4iJQ3Go1CkHDsa") %>%
   geom_tile() +
   scale_fill_viridis_c(guide = "none") +
   theme_minimal() +
-  labs(x = "Time (s)", y = "")
+  labs(x = "Time (s)", y = "", title ="Los")
 
 
 reise <- get_tidy_audio_analysis("6bvTzuFABmFnAAmVZ3nlMh") %>%
@@ -916,7 +717,7 @@ reise <- get_tidy_audio_analysis("6bvTzuFABmFnAAmVZ3nlMh") %>%
   geom_tile() +
   scale_fill_viridis_c(guide = "none") +
   theme_minimal() +
-  labs(x = "Time (s)", y = "")
+  labs(x = "Time (s)", y = "", title="Reise, Reise")
 
 
 grid.arrange(los, reise, ncol=2)
@@ -925,8 +726,20 @@ grid.arrange(los, reise, ncol=2)
 
 ***
 
+```{=html}
+<object data="https://open.spotify.com/embed/track/6IUhPMJf4iJQ3Go1CkHDsa" width="280" height="80">
+    <embed src="https://open.spotify.com/embed/track/6IUhPMJf4iJQ3Go1CkHDsa" width="280" height="80"></embed>
+</object>
+```
+
+
 Comparison of an atypical track (*Los*) to a more typical track (*Reise, Reise*) from Rammstein, both from the album *Reise Reise*. Even though the songs are very different, some similarities can be found in their chordograms. Both show darker lines for the C:7, Eb:7 and Ab;7, and lighter lines around D:min and Bb:maj.
 
+```{=html}
+<object data="https://open.spotify.com/embed/track/6bvTzuFABmFnAAmVZ3nlMh" width="280" height="80">
+    <embed src="https://open.spotify.com/embed/track/6bvTzuFABmFnAAmVZ3nlMh" width="280" height="80"></embed>
+</object>
+```
 
 
 ### Conclusion
