@@ -111,8 +111,6 @@ In addition to this two live albums were also included (27 tracks);
 
 
 
-![](albums.png)
-
 
 
 The studio albums were included to see if their music changed over time and if so how? What changed? What did not change through all those years? Are there similarities between albums?
@@ -124,6 +122,17 @@ The corpus is quite representative as there are plenty of albums, and thus track
 
 A few tracks that are atypical are *Diamant* (*Rammstein*, 2019), *Roter Sand* (*Liebe ist für alle da*, 2009), *Los* (*Reise, Reise*, 2004) and *Ein Lied* (*Rosenrot*, 2005). *Diamant* and *Roter Sand* have sound a lot more like ballads than the industrial metal we're used from Rammstein. *Los* and *Ein Lied* both have a more slow, easy going tempo and have less distortion than other songs in the corpus.
 
+***
+
+```{r out.width = "100%"}
+include_graphics("albums/herzeleid.jpg")
+include_graphics("albums/sehnsucht.jpg")
+include_graphics("albums/mutter.jpg")
+include_graphics("albums/reise.jpg")
+include_graphics("albums/rosenrot.jpg")
+include_graphics("albums/liebe.jpg")
+include_graphics("albums/rammstein.jpg")
+```
 
 
 
@@ -696,7 +705,7 @@ los <- get_tidy_audio_analysis("6IUhPMJf4iJQ3Go1CkHDsa") %>%
   geom_tile() +
   scale_fill_viridis_c(guide = "none") +
   theme_minimal() +
-  labs(x = "Time (s)", y = "", title ="Los")
+  labs(x = "Time (s)", y = "", title ="Los") + theme(plot.title = element_text(hjust = 0.5))
 
 
 reise <- get_tidy_audio_analysis("6bvTzuFABmFnAAmVZ3nlMh") %>%
@@ -717,7 +726,7 @@ reise <- get_tidy_audio_analysis("6bvTzuFABmFnAAmVZ3nlMh") %>%
   geom_tile() +
   scale_fill_viridis_c(guide = "none") +
   theme_minimal() +
-  labs(x = "Time (s)", y = "", title="Reise, Reise")
+  labs(x = "Time (s)", y = "", title="Reise, Reise") + theme(plot.title = element_text(hjust = 0.5))
 
 
 grid.arrange(los, reise, ncol=2)
