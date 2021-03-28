@@ -483,8 +483,8 @@ To get a better understanding of why Spotify gave [*Weit weg*](https://open.spot
 
 
 ```{=html}
-<object data="https://open.spotify.com/embed/track/0sMmtnF7by7WPNeRXCam9H" width="280" height="140">
-    <embed src="https://open.spotify.com/embed/track/0sMmtnF7by7WPNeRXCam9H" width="280" height="140"></embed>
+<object data="https://open.spotify.com/embed/track/0sMmtnF7by7WPNeRXCam9H" width="280" height="80">
+    <embed src="https://open.spotify.com/embed/track/0sMmtnF7by7WPNeRXCam9H" width="280" height="80"></embed>
 </object>
 ```
 
@@ -492,7 +492,9 @@ To get a better understanding of why Spotify gave [*Weit weg*](https://open.spot
 For the first twenty seconds a yellow line can be seen at around 160 bpm in both tempograms. After twenty seconds a yellow line can be seen on the left graph at around 150 bpm while at the right graph the yellow line is at around 250 bpm. 
 
 
-<iframe src="https://open.spotify.com/embed/track/0sMmtnF7by7WPNeRXCam9H" width="582" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+```{=html}
+<iframe src="https://open.spotify.com/embed/track/0sMmtnF7by7WPNeRXCam9H" width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+```
 
 
 In the left graph a vague line can be seen at around 100 bpm which is closer to the actual tempo of the track. Spotify might pick up the somewhat fast drum in the background and based on that give this track such a high mean tempo. Especially since this rhythm is repeated multiple times through the track.
