@@ -338,42 +338,6 @@ A few tracks that are atypical are *Diamant* (*Rammstein*, 2019), *Roter Sand* (
 
 
 
-### What changed between the first and last album from Rammstein?
-
-
-```{r echo = FALSE}
-
-rammstein_first_last <- bind_rows(rammstein_1995, rammstein_2019)
-
-rammstein_f_l_val <- ggplot(rammstein_first_last, aes(valence, danceability, color=factor(track.album.release_date), size=instrumentalness, label=track.name))+
-  geom_point() +
-  theme(legend.title = element_blank())
-
-ggplotly(rammstein_f_l_val)%>%
-  layout(legend = list(
-      orientation = "v",
-      x = "auto",
-      font = list(
-        family = "sans-serif",
-        size = 15,
-        color = "#000"),
-      bgcolor = "#E2E2E2",
-      bordercolor = "#FFFFFF",
-      borderwidth = 2,
-      title=list(text="Instrumentalness")
-    )
-  )
-
-```
-
-
-
-***
-
-When comparing the first and last album, the first one released in 1995 and the last one released in 2019, a few things have changed when looking at spotify features.
-
-
-The features with the most change are danceability, valence and instrumentalness. The danceability, valence and instrumentalness are all lower in the last album than in the first album. 
 
 ### Rammstein's albums over time.
 
@@ -388,7 +352,7 @@ rammstein_dance_val
 
 ***
 
-To see if this was also the case when looking at all albums, the valence, danceability and instrumentalness were plotted for each album. It is clear that the danceability decreases over time, and with that the valence and instrumentalness as well.
+To see how the albums chagnes over time, the valence, danceability and instrumentalness were plotted for each album. It is clear that the danceability decreases over time, and with that the valence and instrumentalness as well.
 
 The last album has the most variation in danceablity and valence. However, the instrumentalness stays quit the same for most tracks in the last album.
 
@@ -403,22 +367,42 @@ first <-
     "",
     "6MPrZZiCfHOPWMFa5OjVhv"
   ) %>%
-  slice(1:30) %>%
   add_audio_analysis()
 last <-
   get_playlist_audio_features(
     "",
     "4zHoeSDpe1tLBOnWaTYuZs"
   ) %>%
-  slice(1:30) %>%
   add_audio_analysis()
 ```
 
 ```{r}
+ramm <- 
+  get_playlist_audio_features("","4zHoeSDpe1tLBOnWaTYuZs") %>% add_audio_analysis()
+LIFAD <- 
+  get_playlist_audio_features("", "5uJSCBbKMkJlFGhpIVAEKL") %>% add_audio_analysis()
+rosenrot <- 
+  get_playlist_audio_features("", "450ruWPhAMlGcgmTpELaJY") %>% add_audio_analysis()
+reise <- 
+  get_playlist_audio_features("", "1sw0say7N84xGnljIUvFxW") %>% add_audio_analysis()
+mutter <- 
+  get_playlist_audio_features("", "6I3LPUsJrAyFJX9M25ocM3") %>% add_audio_analysis()
+sehnucht <- 
+  get_playlist_audio_features("", "1hRBY4y59Tj6MNm5aW2AbH") %>% add_audio_analysis()
+herzeleid <- 
+  get_playlist_audio_features("", "6MPrZZiCfHOPWMFa5OjVhv") %>% add_audio_analysis()
+
+
 first_and_last <-
-  first %>%
-  mutate(genre = "Herzeleid (1995)") %>%
-  bind_rows(last %>% mutate(genre = "Rammstein (2019)")) %>%
+  bind_rows(
+    ramm %>% mutate(album = "RAMMSTEIN (2019)"),
+    LIFAD %>% mutate(album = "LIEBE IST FÜR ALLE DA (2009)"),
+    rosenrot %>% mutate(album = "ROSENROT (2005)"),
+    reise %>% mutate(album = "REISE, REISE (2004)"),
+    mutter %>% mutate(album = "Mutter (2001)"),
+    sehnucht %>% mutate(album = "Sehnsucht (1997)"),
+    herzeleid %>% mutate(album = "Herzeleid (1995)")
+  ) %>%
   mutate(
     sections =
       map(
@@ -429,6 +413,10 @@ first_and_last <-
       )
   ) %>%
   unnest(sections)
+```
+
+
+```{r}
 
 
 test <-
@@ -436,7 +424,7 @@ test <-
     aes(
       x = tempo,
       y = tempo_section_sd,
-      colour = genre,
+      colour = album,
       label = track.name
     )
   ) +
@@ -521,52 +509,6 @@ ggplotly(rammstein_live_not_live)%>%
 When comparing the live tracks, both from Berlin (1999) and from Paris (2017), to the studio tracks it is clear that the studio tracks have a higher valence and more danceability.
 
 Different versions of the tracks are connected with lines. Which show that there is definitely some difference between the two live albums and between the live and studio tracks. One obvious difference is that the live tracks have a higher liveness than the studio track. The live album from Berlin seems to have a higher valence than the live album from Paris, which might be explained by the fact that the older albums also have a higher valence than the newer albums. When comparing the live tracks to their corresponding studio track, almost all studio tracks have a higher valence
-
-
-
-### Comparing two live versions of *Du hast*, one of the most iconic songs of Rammstein.
-
-```{r}
-Du_hast_berlin <-
-  get_tidy_audio_analysis("7c6jrUp0VsgLXhlzP4QZSy") %>%
-  select(segments) %>%
-  unnest(segments) %>%
-  select(start, duration, pitches)
-
-
-
-Du_hast_paris <-
-  get_tidy_audio_analysis("0qrwXiw0o8aoXHbaqSAAzz") %>%
-  select(segments) %>%
-  unnest(segments) %>%
-  select(start, duration, pitches)
-
-
-compmus_long_distance(
-  Du_hast_berlin %>% mutate(pitches = map(pitches, compmus_normalise, "euclidean")),
-  Du_hast_paris %>% mutate(pitches = map(pitches, compmus_normalise, "euclidean")),
-  feature = pitches,
-  method = "angular"
-) %>%
-  ggplot(
-    aes(
-      x = xstart + xduration / 2,
-      width = xduration,
-      y = ystart + yduration / 2,
-      height = yduration,
-      fill = d
-    )
-  ) +
-  geom_tile() +
-  coord_equal() +
-  labs(x = "Du hast live Berlin (1999)", y = "Du hast live Paris (2017)") +
-  theme_minimal() +
-  scale_fill_viridis_c(guide = NULL)
-```
-
-***
-When comparing a track that was played live in 1999 and in 2017 a small diagonal line can be seen in the middle, which indicates that the tracks are indeed somewhat similar.
-
 
 
 
