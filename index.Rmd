@@ -481,6 +481,7 @@ include_graphics(temp_path)
 
 To get a better understanding of why Spotify gave [*Weit weg*](https://open.spotify.com/track/0sMmtnF7by7WPNeRXCam9H?si=_KUDF8oETGaTsCY6k70F2A) such a high mean tempo, the __tempogram__ of the track is plotted. The left tempogram is the same tempogram as on the right but wrapped into a __cyclic tempogram__ to see more details.
 
+
 ```{=html}
 <object data="https://open.spotify.com/embed/track/0sMmtnF7by7WPNeRXCam9H" width="280" height="140">
     <embed src="https://open.spotify.com/embed/track/0sMmtnF7by7WPNeRXCam9H" width="280" height="140"></embed>
@@ -489,6 +490,10 @@ To get a better understanding of why Spotify gave [*Weit weg*](https://open.spot
 
 
 For the first twenty seconds a yellow line can be seen at around 160 bpm in both tempograms. After twenty seconds a yellow line can be seen on the left graph at around 150 bpm while at the right graph the yellow line is at around 250 bpm. 
+
+
+<iframe src="https://open.spotify.com/embed/track/0sMmtnF7by7WPNeRXCam9H" width="582" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+
 
 In the left graph a vague line can be seen at around 100 bpm which is closer to the actual tempo of the track. Spotify might pick up the somewhat fast drum in the background and based on that give this track such a high mean tempo. Especially since this rhythm is repeated multiple times through the track.
 
