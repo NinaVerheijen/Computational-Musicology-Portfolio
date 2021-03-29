@@ -876,7 +876,7 @@ include_graphics("Rammstein.jpg")
 ***
 
 
-In conclusion, Rammsteins music definitely changed between their first and latest album. Danceability and valence both decrease over time, both for the studio albums and for the two live albums. On the other hand, the varience in tempo gets higher over time. Their are some atypical tracks in their albums but there is not enough difference between tracks to make distinct clusters.
+In conclusion, Rammsteins music definitely changed between their first and latest album. Danceability and valence both decreased over time, both for the studio albums and for the two live albums. On the other hand, the varience in tempo gets higher over time. However, there is not enough difference between the tracks to make distinct clusters, only some atypical tracks get clustered together. It is not strange that their music changed since they have been around for almost 30 years and a lot has changed in the music industry. Some might argue that their new album has a more pop rock sound, but I think that their industrial metal style can be found in each album. The core of their music is still the same.
 
 
 
