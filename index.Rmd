@@ -150,9 +150,9 @@ rammstein_dance_val
 
 ***
 
-To see how the albums change over time, the valence, danceability and instrumentalness are plotted for each album. It is clear that the danceability decreases over time, and with that the valence and instrumentalness as well.
+To see how the albums change over time, the __valence__, __danceability__ and __instrumentalness__ are plotted for each album. It is clear that the __danceability decreases__ over time, and with that the __valence and instrumentalness decrease__ as well.
 
-The last album has the most variation in danceablity and valence. However, the instrumentalness stays quite the same for most tracks in the last album.
+The last album has the __most variation in danceablity and valence__. However, the __instrumentalness stays quite the same__ for most tracks in the last album.
 
 
 
@@ -182,7 +182,7 @@ rammstein_live_not_live <- ggplot(live_not_live, aes(valence, energy, size=liven
     hjust = "left",           # Align left side of label with the point.
     vjust = "bottom",         # Align bottom of label with the point.
     nudge_x = 0.02,          # Nudge the label slightly left.
-    nudge_y = 0.03            # Nudge the label slightly up.
+    nudge_y = 0.01            # Nudge the label slightly up.
   ) +
   theme(legend.title = element_blank()) 
 
@@ -221,10 +221,12 @@ Rammstein released two live albums, *Live aus Berlin* (1999) and *Rammstein: Par
 Since there is a 18 year gab between the two albums it is to be expected that their performance, even of songs they play in both performances, has changed. To see what exactly changed the __valence__, __energy__, and __liveness__ are plotted for both live albums and the corresponding studio tracks. Different versions of the tracks are connected with lines.
 
 
-Looking at the plot, there is definitely some difference between the two live albums and between the live and studio tracks. One obvious difference is that the live tracks have a higher liveness than the studio track. The live album from Berlin seems to have a higher valence than the live album from Paris, which might be explained by the fact that the older albums also have a higher valence than the newer albums. When comparing the live tracks to their corresponding studio track, almost all studio tracks have a higher valence. When comparing the live tracks to the studio tracks it is clear that the studio tracks have a higher valence and more danceability. The track that changed the least between the live performances is *Sehnsucht*, listen for yourself!
+Looking at the plot, there is definitely some difference between the two live albums and between the live and studio tracks. One obvious difference is that the live tracks have a __higher liveness__ than the studio track. The live album from Berlin seems to have a __higher valence__ than the live album from Paris, which might be explained by the fact that the older albums also have a __higher valence__ than the newer albums. 
+
+When comparing the live tracks to their corresponding studio track, almost all studio tracks have a __higher valence.__ and __more danceability.__ The track that changed the least between the live performances is *Sehnsucht*, listen for yourself!
 
 
-*Live aus Berlin*
+ [*Sehnsucht*](https://open.spotify.com/track/2jMRyq442BYmJMb87PqumT?si=C8L4dGceSW6-NketWsKWUw), *Live aus Berlin*
 
 ```{=html}
 <object data="https://open.spotify.com/embed/track/2jMRyq442BYmJMb87PqumT" width="280" height="80">
@@ -232,7 +234,7 @@ Looking at the plot, there is definitely some difference between the two live al
 </object>
 ```
 
-*Rammstein: Paris* 
+ [*Sehnsucht*](https://open.spotify.com/track/4TUzUUKS7HhZyAD35vgqVn?si=npbkXBc7SMO--XMq5Fa0SQ), *Rammstein: Paris* 
 
 ```{=html}
 <object data="https://open.spotify.com/embed/track/4TUzUUKS7HhZyAD35vgqVn" width="280" height="80">
@@ -241,7 +243,7 @@ Looking at the plot, there is definitely some difference between the two live al
 ```
 
 
-Studio version
+ [*Sehnsucht*](https://open.spotify.com/track/3oWFQPp5lL5x907hCcCRa9?si=uKaYOHveSgO3YNZgwLAcXg), studio version
 
 ```{=html}
 <object data="https://open.spotify.com/embed/track/3oWFQPp5lL5x907hCcCRa9" width="280" height="80">
