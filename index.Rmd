@@ -124,7 +124,7 @@ A few tracks that are atypical are *Diamant* (*Rammstein*, 2019), *Roter Sand* (
 
 ***
 
-```{r out.width = "100%"}
+```{r out.width = "80%"}
 include_graphics("albums/herzeleid.jpg")
 include_graphics("albums/sehnsucht.jpg")
 include_graphics("albums/mutter.jpg")
@@ -137,7 +137,7 @@ include_graphics("albums/rammstein.jpg")
 
 
 
-### Rammstein's albums over time.
+### Changes in Rammstein's albums over time.
 
 ```{r echo=FALSE}
 rammstein_dance_val <- ggplot(rammstein, aes(track.album.release_date, danceability, size=valence, color=instrumentalness, label=track.name)) +
@@ -152,7 +152,104 @@ rammstein_dance_val
 
 To see how the albums change over time, the valence, danceability and instrumentalness are plotted for each album. It is clear that the danceability decreases over time, and with that the valence and instrumentalness as well.
 
-The last album has the most variation in danceablity and valence. However, the instrumentalness stays quit the same for most tracks in the last album.
+The last album has the most variation in danceablity and valence. However, the instrumentalness stays quite the same for most tracks in the last album.
+
+
+
+### Changes in Rammsteins live performance. Comparing two live albums.
+
+
+```{r echo=FALSE}
+
+rammstein_live_not_live <- ggplot(live_not_live, aes(valence, energy, size=liveness, color=category, label=track.name)) +
+  geom_point(alpha=0.6) + 
+  geom_path(aes(group=track.name), size = 0.5, color="black", alpha= 0.5)+
+    geom_text(                  # Add text labels from above.
+    aes(
+      x = valence,
+      y = energy,
+      label = label
+    ),
+    data = 
+      tibble(
+        label = c("Sehnsucht"),
+        category = c("live at berlin"),
+        valence = c(0.28),
+        energy = c(0.96)
+      ),
+    colour = "black",         # Override colour (not mode here).
+    size = 3,                 # Override size (not loudness here).
+    hjust = "left",           # Align left side of label with the point.
+    vjust = "bottom",         # Align bottom of label with the point.
+    nudge_x = 0.02,          # Nudge the label slightly left.
+    nudge_y = 0.03            # Nudge the label slightly up.
+  ) +
+  theme(legend.title = element_blank()) 
+
+
+
+ggplotly(rammstein_live_not_live)%>%
+  layout(legend = list(
+      orientation = "v",
+      x = "auto",
+      itemizing = "trace",
+      font = list(
+        family = "sans-serif",
+        size = 15,
+        color = "#000"),
+      bgcolor = "#E2E2E2",
+      bordercolor = "#FFFFFF",
+      borderwidth = 2
+    )
+  ) %>%
+  layout(legend=list(title=list(text=' Liveness')))
+```
+
+*** 
+
+Rammstein released two live albums, *Live aus Berlin* (1999) and *Rammstein: Paris* (2017). The two live albums have seven tracks in common, which are listed below.
+
+
+- *Wollt ihr das Bett in Flammen sehen?*
+- *Sehnsucht*
+- *Asche zu Asche*
+- *Du riechst so gut*
+- *Du hast*
+- *Bück dich*
+- *Engel*
+
+Since there is a 18 year gab between the two albums it is to be expected that their performance, even of songs they play in both performances, has changed. To see what exactly changed the __valence__, __energy__, and __liveness__ are plotted for both live albums and the corresponding studio tracks. Different versions of the tracks are connected with lines.
+
+
+Looking at the plot, there is definitely some difference between the two live albums and between the live and studio tracks. One obvious difference is that the live tracks have a higher liveness than the studio track. The live album from Berlin seems to have a higher valence than the live album from Paris, which might be explained by the fact that the older albums also have a higher valence than the newer albums. When comparing the live tracks to their corresponding studio track, almost all studio tracks have a higher valence. When comparing the live tracks to the studio tracks it is clear that the studio tracks have a higher valence and more danceability. The track that changed the least between the live performances is *Sehnsucht*, listen for yourself!
+
+
+*Live aus Berlin*
+
+```{=html}
+<object data="https://open.spotify.com/embed/track/2jMRyq442BYmJMb87PqumT" width="280" height="80">
+    <embed src="https://open.spotify.com/embed/track/2jMRyq442BYmJMb87PqumT" width="280" height="80"></embed>
+</object>
+```
+
+*Rammstein: Paris* 
+
+```{=html}
+<object data="https://open.spotify.com/embed/track/4TUzUUKS7HhZyAD35vgqVn" width="280" height="80">
+    <embed src="https://open.spotify.com/embed/track/4TUzUUKS7HhZyAD35vgqVn" width="280" height="80"></embed>
+</object>
+```
+
+
+Studio version
+
+```{=html}
+<object data="https://open.spotify.com/embed/track/3oWFQPp5lL5x907hCcCRa9" width="280" height="80">
+    <embed src="https://open.spotify.com/embed/track/3oWFQPp5lL5x907hCcCRa9" width="280" height="80"></embed>
+</object>
+```
+
+
 
 
 
@@ -292,39 +389,6 @@ For the first twenty seconds a yellow line can be seen at around 160 bpm in both
 In the left graph a vague line can be seen at around 100 bpm which is closer to the actual tempo of the track. Spotify might pick up the somewhat fast drum in the background and based on that give this track such a high mean tempo. Especially since this rhythm is repeated multiple times through the track.
 
 
-### Comparing live tracks to studio tracks.
-
-
-```{r echo=FALSE}
-
-rammstein_live_not_live <- ggplot(live_not_live, aes(valence, energy, size=liveness, color=category, label=track.name)) +
-  geom_point(alpha=0.6) + 
-  geom_path(aes(group=track.name), size = 0.05, color="black")+
-  theme(legend.title = element_blank())
-
-
-
-ggplotly(rammstein_live_not_live)%>%
-  layout(legend = list(
-      orientation = "v",
-      x = "auto",
-      itemizing = "trace",
-      font = list(
-        family = "sans-serif",
-        size = 15,
-        color = "#000"),
-      bgcolor = "#E2E2E2",
-      bordercolor = "#FFFFFF",
-      borderwidth = 2
-    )
-  ) %>%
-  layout(legend=list(title=list(text=' Liveness')))
-```
-
-*** 
-When comparing the live tracks, both from Berlin (1999) and from Paris (2017), to the studio tracks it is clear that the studio tracks have a higher valence and more danceability.
-
-Different versions of the tracks are connected with lines. Which show that there is definitely some difference between the two live albums and between the live and studio tracks. One obvious difference is that the live tracks have a higher liveness than the studio track. The live album from Berlin seems to have a higher valence than the live album from Paris, which might be explained by the fact that the older albums also have a higher valence than the newer albums. When comparing the live tracks to their corresponding studio track, almost all studio tracks have a higher valence
 
 
 
@@ -417,7 +481,7 @@ Besides that it is difficult to see how the other clusters are formed since ther
 
 
 
-### Why is *Diamant* so different from their other songs?
+### Why is *Diamant* so different from Rammsteins other songs?
 
 
 #### Diamant
