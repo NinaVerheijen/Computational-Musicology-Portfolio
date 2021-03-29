@@ -90,7 +90,7 @@ rammstein_sum <- rammstein%>%
 
 
 
-### Introduction
+### Rammstein, how did their music change?
 
 Starting in Berlin in 1994, Rammstein has been around for almost 30 years. With their first album *Herzeleid* released in September 1995, and their latest album *Rammstein* in May 2019, a lot has changed in the music industry since they first started. This raises the question whether their music has changed as well, and if so, how?
 
@@ -124,7 +124,7 @@ A few tracks that are atypical are *Diamant* (*Rammstein*, 2019), *Roter Sand* (
 
 ***
 
-```{r out.width = "80%"}
+```{r out.width = "80%", out.height="80%", fig.align="center"}
 include_graphics("albums/herzeleid.jpg")
 include_graphics("albums/sehnsucht.jpg")
 include_graphics("albums/mutter.jpg")
@@ -480,13 +480,7 @@ Looking at the __Dendogram__, one small cluster on the right and a much bigger c
 Besides that it is difficult to see how the other clusters are formed since there are not much clusters that stand out in the __Heatmap__. 
 
 
-
-
-
 ### Why is *Diamant* so different from Rammsteins other songs?
-
-
-#### Diamant
 
 ```{r}
 diamant <-
@@ -508,38 +502,9 @@ diamant <-
         method = "mean"
       )
   )
-bind_rows(
-  diamant %>%
-    compmus_self_similarity(pitches, "aitchison") %>%
-    mutate(d = d / max(d), type = "Chroma"),
-  diamant %>%
-    compmus_self_similarity(timbre, "euclidean") %>%
-    mutate(d = d / max(d), type = "Timbre")
-) %>%
-  mutate() %>%
-  ggplot(
-    aes(
-      x = xstart + xduration / 2,
-      width = xduration,
-      y = ystart + yduration / 2,
-      height = yduration,
-      fill = d
-    )
-  ) +
-  geom_tile() +
-  coord_fixed() +
-  facet_wrap(~type) +
-  scale_fill_viridis_c(guide = "none") +
-  theme_classic() +
-  labs(x = "", y = "")
-```
 
+#---------------------
 
-
-
-#### Du hast
-
-```{r echo = FALSE}
 du_hast <-
   get_tidy_audio_analysis("5awDvzxWfd53SSrsRZ8pXO") %>%
   compmus_align(bars, segments) %>%
@@ -559,36 +524,10 @@ du_hast <-
         method = "mean"
       )
   )
-bind_rows(
-  du_hast %>%
-    compmus_self_similarity(pitches, "aitchison") %>%
-    mutate(d = d / max(d), type = "Chroma"),
-  du_hast %>%
-    compmus_self_similarity(timbre, "euclidean") %>%
-    mutate(d = d / max(d), type = "Timbre")
-) %>%
-  mutate() %>%
-  ggplot(
-    aes(
-      x = xstart + xduration / 2,
-      width = xduration,
-      y = ystart + yduration / 2,
-      height = yduration,
-      fill = d
-    )
-  ) +
-  geom_tile() +
-  coord_fixed() +
-  facet_wrap(~type) +
-  scale_fill_viridis_c(guide = "none") +
-  theme_classic() +
-  labs(x = "", y = "")
-```
+
+#---------------------
 
 
-#### Link 2 3 4
-
-```{r echo = FALSE}
 links <-
   get_tidy_audio_analysis("52XYwQKlXp7scE7KrBBCID") %>%
   compmus_align(bars, segments) %>%
@@ -608,32 +547,120 @@ links <-
         method = "mean"
       )
   )
-bind_rows(
-  links %>%
-    compmus_self_similarity(pitches, "aitchison") %>%
-    mutate(d = d / max(d), type = "Chroma"),
-  links %>%
-    compmus_self_similarity(timbre, "euclidean") %>%
-    mutate(d = d / max(d), type = "Timbre")
-) %>%
-  mutate() %>%
-  ggplot(
-    aes(
-      x = xstart + xduration / 2,
-      width = xduration,
-      y = ystart + yduration / 2,
-      height = yduration,
-      fill = d
-    )
-  ) +
-  geom_tile() +
-  coord_fixed() +
-  facet_wrap(~type) +
-  scale_fill_viridis_c(guide = "none") +
-  theme_classic() +
-  labs(x = "", y = "")
+
 ```
 
+
+```{r}
+diamant_timbre <- diamant %>%
+    compmus_self_similarity(timbre, "euclidean") %>%
+  ggplot(
+      aes(
+        x = xstart + xduration / 2,
+        width = xduration,
+        y = ystart + yduration / 2,
+        height = yduration,
+        fill = d )) +
+  geom_tile() +
+  coord_fixed() +
+  scale_fill_viridis_c(guide = "none") +
+  theme_classic() +
+  labs(x = "", y = "Timbre", title="Diamant")
+
+
+
+diamant_chroma <- diamant %>%
+    compmus_self_similarity(pitches, "aitchison") %>%
+  ggplot(
+      aes(
+        x = xstart + xduration / 2,
+        width = xduration,
+        y = ystart + yduration / 2,
+        height = yduration,
+        fill = d )) +
+  geom_tile() +
+  coord_fixed() +
+  scale_fill_viridis_c(guide = "none") +
+  theme_classic() +
+  labs(x = "", y = "Chroma", title="Diamant")
+
+#---------------------
+
+du_hast_timbre <- du_hast %>%
+    compmus_self_similarity(timbre, "euclidean") %>%
+  ggplot(
+      aes(
+        x = xstart + xduration / 2,
+        width = xduration,
+        y = ystart + yduration / 2,
+        height = yduration,
+        fill = d )) +
+  geom_tile() +
+  coord_fixed() +
+  scale_fill_viridis_c(guide = "none") +
+  theme_classic() +
+  labs(x = "", y = "", title="Du hast")
+
+
+
+du_hast_chroma <- du_hast %>%
+    compmus_self_similarity(pitches, "aitchison") %>%
+  ggplot(
+      aes(
+        x = xstart + xduration / 2,
+        width = xduration,
+        y = ystart + yduration / 2,
+        height = yduration,
+        fill = d )) +
+  geom_tile() +
+  coord_fixed() +
+  scale_fill_viridis_c(guide = "none") +
+  theme_classic() +
+  labs(x = "", y = "", title="Du hast")
+
+#---------------------
+
+links_timbre <- links %>%
+    compmus_self_similarity(timbre, "euclidean") %>%
+  ggplot(
+      aes(
+        x = xstart + xduration / 2,
+        width = xduration,
+        y = ystart + yduration / 2,
+        height = yduration,
+        fill = d )) +
+  geom_tile() +
+  coord_fixed() +
+  scale_fill_viridis_c(guide = "none") +
+  theme_classic() +
+  labs(x = "", y = "", title="Link 2 3 4")
+
+
+
+links_chroma <- links %>%
+    compmus_self_similarity(pitches, "aitchison") %>%
+  ggplot(
+      aes(
+        x = xstart + xduration / 2,
+        width = xduration,
+        y = ystart + yduration / 2,
+        height = yduration,
+        fill = d )) +
+  geom_tile() +
+  coord_fixed() +
+  scale_fill_viridis_c(guide = "none") +
+  theme_classic() +
+  labs(x = "", y = "", title="Link 2 3 4")
+
+```
+
+
+```{r}
+grid.arrange(diamant_chroma, du_hast_chroma, links_chroma, diamant_timbre, du_hast_timbre, links_timbre, nrow = 2, ncol = 3)
+
+```
+
+***
 
 ```{=html}
 <object data="https://open.spotify.com/embed/track/1UZs9dauJnxrqYxMIzxnwC" width="280" height="80">
@@ -642,7 +669,7 @@ bind_rows(
 ```
 
 
-As mentioned before, [*Diamant*](https://open.spotify.com/track/1UZs9dauJnxrqYxMIzxnwC?si=xHwZi-j7Sk-H8A7a8I3nFw) is a very atypical song from Rammstein since it sound much more like a full on ballad than a heavy metal song. To see how this song differs from a more typical Rammstein song like [*Du hast*](https://open.spotify.com/track/5awDvzxWfd53SSrsRZ8pXO?si=RdGH4qPLSMm72TZdoWHu2Q) or [*Links 2 3 4*](https://open.spotify.com/track/52XYwQKlXp7scE7KrBBCID?si=w3hQgOvxStKqxwlWiN0opw), the chroma-based and timbre-based self-similarity matrices for these songs are shown. What stands out is that *Du hast* and *Links 2 3 4* have a much more clear structure and when listening to the songs the patterns are very recognizable. *Diamant* on the other hand has a much more complex structure and when listening to the song it is hard to recognize the patterns from the matrix.
+As mentioned before, [*Diamant*](https://open.spotify.com/track/1UZs9dauJnxrqYxMIzxnwC?si=xHwZi-j7Sk-H8A7a8I3nFw) is a very atypical song from Rammstein since it sound much more like a full on ballad than a heavy metal song. To see how this song differs from a more typical Rammstein song like [*Du hast*](https://open.spotify.com/track/5awDvzxWfd53SSrsRZ8pXO?si=RdGH4qPLSMm72TZdoWHu2Q) or [*Links 2 3 4*](https://open.spotify.com/track/52XYwQKlXp7scE7KrBBCID?si=w3hQgOvxStKqxwlWiN0opw), the __chroma-based and timbre-based self-similarity matrices__ for these songs are shown. What stands out is that *Du hast* and *Links 2 3 4* have a much more clear structure and when listening to the songs the patterns are very recognizable. *Diamant* on the other hand has a much more complex structure and when listening to the song it is hard to recognize the patterns from the matrix.
 
 ```{=html}
 <object data="https://open.spotify.com/embed/track/5awDvzxWfd53SSrsRZ8pXO" width="280" height="80">
@@ -650,7 +677,7 @@ As mentioned before, [*Diamant*](https://open.spotify.com/track/1UZs9dauJnxrqYxM
 </object>
 ```
 
-When looking at the timbre based self-similarity matrices, *Du hast* and *Links 2 3 4* have more dark blocks, meaning more homogeneity within the timeframes. Whereas *Diamant* has more vertical yellow lines, indicating more novelties. Besides that, *Diamant* also has a lot of diagonal lines in the chroma based matrix and only a vaguely visible checkerboard pattern, which indicates that a melodic phrase or passage is repeated in different parts of the song. It starts of with just guitar and voice and adds more and more strings as the song progresses. The other two tracks both start with an intro, but after that only have a few vertical lines, thus only a few novelties.
+When looking at the timbre based self-similarity matrices, *Du hast* and *Links 2 3 4* have more dark blocks, meaning __more homogeneity__ within the timeframes. Whereas *Diamant* has more vertical yellow lines, indicating __more novelties__. Besides that, *Diamant* also has a lot of diagonal lines in the chroma based matrix and only a vaguely visible checkerboard pattern, which indicates that __a melodic phrase or passage is repeated in different parts of the song__. It starts of with just guitar and voice and adds more and more strings as the song progresses. The other two tracks both start with an intro, but after that only have a few vertical lines, thus only a __few novelties__.
 
 ```{=html}
 <object data="https://open.spotify.com/embed/track/52XYwQKlXp7scE7KrBBCID" width="280" height="80">
@@ -753,6 +780,15 @@ key_templates <-
 ### Chordogram
 
 ```{r}
+
+stamps_los <- data.frame(label=c("Vocal part","vocal part"),
+                        vals= c(78, 166),
+                        tringsAsFactors = FALSE)
+
+stamps_reise <- data.frame(label=c("backing vocals stop"),
+                        vals= c(37),
+                        tringsAsFactors = FALSE)
+
 los <- get_tidy_audio_analysis("6IUhPMJf4iJQ3Go1CkHDsa") %>%
   compmus_align(bars, segments) %>%
   select(bars) %>%
@@ -769,6 +805,9 @@ los <- get_tidy_audio_analysis("6IUhPMJf4iJQ3Go1CkHDsa") %>%
     aes(x = start + duration / 2, width = duration, y = name, fill = d)
   ) +
   geom_tile() +
+  geom_vline(mapping = aes(xintercept = vals, color="white"),
+             data = stamps_los,
+             show.legend = FALSE) +
   scale_fill_viridis_c(guide = "none") +
   theme_minimal() +
   labs(x = "Time (s)", y = "", title ="Los") + theme(plot.title = element_text(hjust = 0.5))
@@ -790,6 +829,9 @@ reise <- get_tidy_audio_analysis("6bvTzuFABmFnAAmVZ3nlMh") %>%
     aes(x = start + duration / 2, width = duration, y = name, fill = d)
   ) +
   geom_tile() +
+  geom_vline(mapping = aes(xintercept = vals, color="white"),
+             data = stamps_reise,
+             show.legend = FALSE) +
   scale_fill_viridis_c(guide = "none") +
   theme_minimal() +
   labs(x = "Time (s)", y = "", title="Reise, Reise") + theme(plot.title = element_text(hjust = 0.5))
@@ -808,7 +850,7 @@ grid.arrange(los, reise, ncol=2)
 ```
 
 
-Comparison of an atypical track (*Los*) to a more typical track (*Reise, Reise*) from Rammstein, both from the album *Reise Reise*. Even though the songs are very different, some similarities can be found in their chordograms. Both show darker lines for the C:7, Eb:7 and Ab;7, and lighter lines around D:min and Bb:maj.
+Comparison of an atypical track (*Los*) to a more typical track (*Reise, Reise*) from Rammstein, both from the album *Reise Reise*. Even though the songs are very different, some similarities can be found in their __chordograms.__ Both show darker lines for the C:7, Eb:7 and Ab;7, and lighter lines around D:min and Bb:maj. Some things that stand out in the __chordogram__ of [*Los*](https://open.spotify.com/track/6IUhPMJf4iJQ3Go1CkHDsa?si=7xFkEQvcQFOeg1RlR0Ls8g) is the vocal part that starts at 78 seconds and the adding of vocals after an instrumental part at 166 seconds.
 
 ```{=html}
 <object data="https://open.spotify.com/embed/track/6bvTzuFABmFnAAmVZ3nlMh" width="280" height="80">
@@ -816,9 +858,25 @@ Comparison of an atypical track (*Los*) to a more typical track (*Reise, Reise*)
 </object>
 ```
 
+What stands out in the __chordogram__ or [*Reise, Reise*](https://open.spotify.com/track/6bvTzuFABmFnAAmVZ3nlMh?si=v_ln6OQNSXCwbP21W7nK4A), is the change from intro to verse at 37 seconds.
 
-### Conclusion
-In conclusion, Rammsteins music definitely changed between their first and latest album. Danceability and valence both decrease over time. On the other hand, the varience in tempo gets higher over time. Their are some atypical tracks in their albums but there is not enough difference between tracks to make distinct clusters.
+
+
+### Conclusion {data-commentary-width=500}
+
+
+```{r out.width = "60%", out.height="60%", fig.align="center"}
+
+include_graphics("rammstein_old.png")
+include_graphics("Rammstein.jpg")
+
+
+```
+
+***
+
+
+In conclusion, Rammsteins music definitely changed between their first and latest album. Danceability and valence both decrease over time, both for the studio albums and for the two live albums. On the other hand, the varience in tempo gets higher over time. Their are some atypical tracks in their albums but there is not enough difference between tracks to make distinct clusters.
 
 
 
